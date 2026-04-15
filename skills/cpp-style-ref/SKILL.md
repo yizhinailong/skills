@@ -1,6 +1,6 @@
 ---
 name: cpp-style-ref
-description: C++ coding style reference. Select the appropriate reference based on the project build system: xmake projects use references-xmake (C++20 modules), CMake + vcpkg projects use references-cmake-vcpkg (.hpp/.cpp). Applies when writing or reviewing C++ code, naming identifiers, organizing modules or headers, or when the user mentions C++ style.
+description: "C++ coding style reference. Select the appropriate reference based on the project build system: xmake projects use references-xmake (C++20 modules), CMake + vcpkg projects use references-cmake-vcpkg (.hpp/.cpp). Applies when writing or reviewing C++ code, naming identifiers, organizing modules or headers, or when the user mentions C++ style."
 ---
 
 # cpp-style-ref
