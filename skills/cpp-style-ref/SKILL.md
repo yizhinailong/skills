@@ -1,6 +1,6 @@
 ---
 name: cpp-style-ref
-description: 为 cpp 项目应用编码风格。适用于编写或审查 C++ 代码、命名标识符、组织 .cppm/.cpp 文件，或用户提及 C++ 风格时。
+description: 为使用 xmake 构建的 cpp 项目应用编码风格。适用于编写或审查 C++ 代码、命名标识符、组织 .cppm/.cpp 文件，或用户提及 C++ 风格时。
 ---
 
 # cpp-style-ref

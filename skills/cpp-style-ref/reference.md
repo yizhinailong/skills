@@ -1,6 +1,6 @@
-# mcpp-style-ref 参考
+# cpp-style-ref 参考
 
-详细风格规则。
+详细风格规则，C++23，使用 `import std`。
 
 ## 一、标识符命名
 
@@ -10,44 +10,72 @@
 struct StyleRef {
     using FileNameType = std::string;
 };
+enum class HttpStatus { Ok, NotFound };
 ```
 
-### 1.1 对象/数据成员 — camelCase（小驼峰）
+### 1.1 对象/数据成员 — snake_case（下划线）
 
 ```cpp
-struct StyleRef {
-    std::string fileName;
+std::string file_name;
+int max_retry_count;
+```
+
+### 1.2 函数
+
+公有函数使用 PascalCase（大驼峰），私有函数使用 camelCase（小驼峰）：
+
+```cpp
+class StyleRef {
+public:
+    void LoadConfigFile(std::string file_name);  // 公有大驼峰
+private:
+    void loadConfigFile(std::string config);     // 私有小驼峰
 };
-StyleRef mcppStyle;
 ```
 
-### 1.2 函数 — snake_case（下划线）
+自由函数使用 snake_case（下划线）：
 
 ```cpp
-void load_config_file(const std::string& fileName);
-void parse_();
-int max_retry_count();
+void load_config_file(const std::string& file_name);
+auto parse() -> void;
 ```
 
-### 1.3 私有 — `_` 后缀
+### 1.3 私有 — `m_` 前缀
 
-私有的数据成员和函数使用 `_` 后缀：
+私有数据成员使用 `m_` 前缀：
 
 ```cpp
 private:
-    std::string fileName_;
-    void parse_(const std::string& config);
+    std::string m_file_name;
+    int m_config_text;
 ```
 
-### 1.4 空格
+### 1.4 其他前缀
+
+- 静态成员：`s_` 前缀 — `s_style_ref`
+- 全局变量：`g_` 前缀 — `g_style_ref`、`g_debug`
+
+### 1.5 常量 — UPPER_SNAKE
+
+```cpp
+constexpr int MAX_SIZE { 1024 };
+constexpr auto DEFAULT_TIMEOUT { 30 };
+```
+
+### 1.6 命名空间 — 全小写
+
+```cpp
+namespace mcpplibs { /* ... */ }
+namespace mcpp::style_ref { /* ... */ }
+```
+
+### 1.7 空格
 
 运算符两侧加空格以增强可读性：`T x { ... }`、`int n { 42 }`。
 
-### 1.5 其他
+### 1.8 模板命名
 
-- 常量：`MAX_SIZE`、`DEFAULT_TIMEOUT`
-- 全局：`gStyleRef`、`g_debug`
-- 模板命名：遵循类/函数命名风格
+遵循类/函数命名风格。
 
 ---
 
@@ -66,49 +94,59 @@ export module module_name;
 import std;
 import xxx;
 
-export int add(int a, int b) {
+export auto Add(int a, int b) -> int {
     return a + b;
 }
 ```
 
-### .cppm 与 .h/.hpp
+### .cppm 与 .cpp
 
 使用 `.cppm` 作为模块接口。用 `export` 关键字导出：
 
 ```cpp
 export module mcpplibs;
 
-export int add(int a, int b) {
+export auto Add(int a, int b) -> int {
     return a + b;
 }
 ```
 
 ### 接口与实现
 
-合并（全部在 .cppm）与分离（.cppm + .cpp）均有效。
-
-**合并于 .cppm** — 见上方「.cppm 与 .h/.hpp」：导出与实现在同一文件。
-
-**方式一：命名空间隔离**
+**写法 A：合并** — 接口与实现在同一 `.cppm`：
 
 ```cpp
-export module mcpplibs;
+// mylib.cppm
+export module mylib;
 
-namespace mcpplibs_impl {
-    int add(int a, int b) { return a + b; }
+export auto Add(int a, int b) -> int {
+    return a + b;
 }
+```
 
-export namespace mcpplibs {
-    using mcpplibs_impl::add;
+**写法 B：分离** — 接口在 `.cppm`，实现在 `.cpp`（编译期隐藏实现）：
+
+```cpp
+// error.cppm（接口）
+export module error;
+
+export struct Error {
+    auto Test() -> void;
 };
 ```
 
-**方式二：分离（.cppm + .cpp）**
+```cpp
+// error.cpp（实现）
+module error;
 
-- `.cppm`：仅接口 — `export module error;` + `export struct Error { void test(); };`
-- `.cpp`：实现 — `module error;` + 函数体
+import std;
 
-简单模块用合并；需隐藏实现或减少编译依赖时用分离。
+auto Error::Test() -> void {
+    std::println("Hello");
+}
+```
+
+简单模块用写法 A；需隐藏实现或减少编译依赖时用写法 B。
 
 ### 多文件模块
 
@@ -120,7 +158,6 @@ a/
 │   ├── b1.cppm # export module a.b:b1
 │   └── b2.cppm # export module a.b:b2
 ├── b.cppm      # export module a.b
-└── c.cppm      # module a.c
 a.cppm          # export module a
 ```
 
@@ -130,9 +167,75 @@ a.cppm          # export module a
 ```cpp
 // a.cppm
 export module a;
+
+export import a.b;
 export import :a2;
+
+import std;
 import :a1;
+
+namespace a {
+    export auto FuncA() -> void {
+        std::println("Function FuncA from module a");
+        FuncA1();
+        FuncA2();
+    }
+} // namespace a
 ```
+
+```cpp
+// a/a1.cppm — 内部分区
+export module a:a1;
+
+import std;
+
+namespace a {
+    export auto FuncA1() -> void;
+
+    auto FuncA1() -> void {
+        std::println("Function FuncA1 from module a:a1");
+    }
+} // namespace a
+```
+
+```cpp
+// a/a2.cppm — 可导出分区
+export module a:a2;
+
+import :a1;
+import std;
+
+namespace a {
+    export auto FuncA2() -> void {
+        std::println("Function FuncA2 from module a:a2");
+        FuncA1();
+    }
+} // namespace a
+```
+
+```cpp
+// a/b/b.cppm
+export module a.b;
+
+export import :b1;
+export import :b2;
+
+import std;
+
+namespace a::b {
+    export auto FuncAb() -> void {
+        std::println("Function FuncAb from module a.b");
+        FuncB1();
+        FuncB2();
+    }
+} // namespace a::b
+```
+
+### 模块命名规则
+
+- 模块：`topdir.subdir.filename`（如 `a.b`, `a.c`）
+- 分区：`module_name:partition`（如 `a:a1`, `a.b:b1`）
+- 用目录路径区分同名：`a/c.cppm` → `a.c`，`b/c.cppm` → `b.c`
 
 ### 向前兼容
 
@@ -154,12 +257,66 @@ export namespace lua {
 
 ### 其他
 
-- 优先用 `constexpr` 替代宏
+- 优先用 `constexpr`、`inline`、`concept` 替代宏
 - 模板的静态成员：使用 `inline static`（C++17）确保单一定义
 
 ---
 
-## 三、实践参考
+## 三、类布局
+
+```cpp
+class StyleRef {
+private:
+    std::string m_file_name;  // 数据成员带 m_ 前缀
+
+public:  // Big Five
+    StyleRef() = default;
+    StyleRef(const StyleRef&) = default;
+    StyleRef(StyleRef&&) = default;
+    auto operator=(const StyleRef&) -> StyleRef& = default;
+    auto operator=(StyleRef&&) -> StyleRef& = default;
+    ~StyleRef() = default;
+
+public:  // 公有接口
+    void LoadConfigFile(std::string file_name);  // 函数大驼峰，参数下划线
+
+private:
+    void loadConfigFile(std::string config);  // 私有函数小驼峰
+};
+```
+
+---
+
+## 四、构建配置
+
+使用 xmake 构建：
+
+```lua
+add_rules("mode.debug", "mode.release")
+
+set_languages("c++26")
+set_rundir("$(projectdir)")
+set_policy("build.c++.modules", true)
+
+target("mylib", function ()
+    set_kind("binary")
+
+    add_files("src/main.cpp")
+    add_files("**.cppm")
+end)
+
+-- 分离式模块需要单独 target
+target("error", function ()
+    set_kind("static")
+
+    add_files("src/error.cppm")
+    add_files("src/error.cpp")
+end)
+```
+
+---
+
+## 五、实践参考
 
 ### auto
 
