@@ -1,101 +1,101 @@
 ---
 name: cpp-style-ref
-description: C++ 项目的编码风格参考。根据项目构建方式选择对应参考：xmake 项目参考 references-xmake（C++20 模块），CMake + vcpkg 项目参考 references-cmake-vcpkg（.hpp/.cpp）。适用于编写或审查 C++ 代码、命名标识符、组织模块或头文件，或用户提及 C++ 风格时。
+description: C++ coding style reference. Select the appropriate reference based on the project build system: xmake projects use references-xmake (C++20 modules), CMake + vcpkg projects use references-cmake-vcpkg (.hpp/.cpp). Applies when writing or reviewing C++ code, naming identifiers, organizing modules or headers, or when the user mentions C++ style.
 ---
 
 # cpp-style-ref
 
-C++ 项目的编码风格参考。根据项目构建方式选择对应的参考目录：
+C++ coding style reference. Select the appropriate reference directory based on the project build system:
 
-- **xmake** → `references-xmake/`（C++20 模块，`.cppm` / `.cpp`）
-- **CMake + vcpkg** → `references-cmake-vcpkg/`（传统头文件，`.hpp` / `.cpp`）
+- **xmake** → `references-xmake/` (C++20 modules, `.cppm` / `.cpp`)
+- **CMake + vcpkg** → `references-cmake-vcpkg/` (traditional headers, `.hpp` / `.cpp`)
 
-## 快速参考
+## Quick Reference
 
-### 命名
+### Naming
 
-| 种类         | 风格                 | 示例                              |
-| ------------ | -------------------- | --------------------------------- |
-| 类型/类      | PascalCase（大驼峰） | `StyleRef`, `HttpServer`          |
-| 对象/成员    | snake_case（下划线） | `file_name`, `config_text`        |
-| 公有函数     | PascalCase（大驼峰） | `LoadConfigFile()`, `Parse()`     |
-| 私有函数     | camelCase（小驼峰）  | `loadConfigFile()`, `parse()`     |
-| 自由函数     | snake_case（下划线） | `load_config_file()`, `parse_()`  |
-| 私有成员     | `m_` 前缀            | `m_file_name`, `m_config_text`    |
-| 常量         | UPPER_SNAKE          | `MAX_SIZE`, `DEFAULT_TIMEOUT`     |
-| 全局         | `g_` 前缀            | `g_style_ref`                     |
-| 静态         | `s_` 前缀            | `s_style_ref`                     |
-| 命名空间     | 全小写               | `mcpplibs`, `mylib`               |
-| 多级命名空间 | 全小写               | `mcpp::style_ref`, `mcpp::utils`  |
-| 枚举         | PascalCase（大驼峰） | `enum class StyleRef { ... };`    |
+| Category          | Style         | Examples                         |
+| ----------------- | ------------- | -------------------------------- |
+| Types/Classes     | PascalCase    | `StyleRef`, `HttpServer`         |
+| Objects/Members   | snake_case    | `file_name`, `config_text`       |
+| Public functions  | PascalCase    | `LoadConfigFile()`, `Parse()`    |
+| Private functions | camelCase     | `loadConfigFile()`, `parse()`    |
+| Free functions    | snake_case    | `load_config_file()`, `parse_()` |
+| Private members   | `m_` prefix   | `m_file_name`, `m_config_text`   |
+| Constants         | UPPER_SNAKE   | `MAX_SIZE`, `DEFAULT_TIMEOUT`    |
+| Globals           | `g_` prefix   | `g_style_ref`                    |
+| Statics           | `s_` prefix   | `s_style_ref`                    |
+| Namespaces        | all lowercase | `mcpplibs`, `mylib`              |
+| Nested namespaces | all lowercase | `mcpp::style_ref`, `mcpp::utils` |
+| Enums             | PascalCase    | `enum class StyleRef { ... };`   |
 
-### 构建方式
+### Build Systems
 
-- **xmake** — 原生支持 C++20 模块，使用 `.cppm` / `.cpp`（参考 `references-xmake/`）
-- **CMake + vcpkg** — 传统头文件组织，使用 `.hpp` / `.cpp`（参考 `references-cmake-vcpkg/`）
+- **xmake** — native C++20 module support, uses `.cppm` / `.cpp` (see `references-xmake/`)
+- **CMake + vcpkg** — traditional header organization, uses `.hpp` / `.cpp` (see `references-cmake-vcpkg/`)
 
-### 模块基础
+### Module Basics
 
-- 使用 `import std` 替代 `#include <print>` 和 `#include <xxx>`
-- 使用 `.cppm` 作为模块接口；分离实现时用 `.cpp`
-- `export module module_name;` — 模块声明
-- `export import :partition;` — 导出分区
-- `import :partition;` — 内部分区（不导出）
+- Use `import std` instead of `#include <print>` and `#include <xxx>`
+- Use `.cppm` for module interfaces; use `.cpp` for separated implementations
+- `export module module_name;` — module declaration
+- `export import :partition;` — export partition
+- `import :partition;` — internal partition (not exported)
 
-### 模块结构
+### Module Structure
 
 ```
 // .cppm
 export module a;
 
 export import a.b;
-export import :a2;   // 可导出分区
+export import :a2;   // exportable partition
 
 import std;
-import :a1;          // 内部分区
+import :a1;          // internal partition
 ```
 
-### 模块命名
+### Module Naming
 
-- 模块：`topdir.subdir.filename`（如 `a.b`, `a.c`）
-- 分区：`module_name:partition`（如 `a:a1`, `a.b:b1`）
-- 用目录路径区分同名：`a/c.cppm` → `a.c`，`b/c.cppm` → `b.c`
+- Modules: `topdir.subdir.filename` (e.g., `a.b`, `a.c`)
+- Partitions: `module_name:partition` (e.g., `a:a1`, `a.b:b1`)
+- Use directory paths to distinguish identical names: `a/c.cppm` → `a.c`, `b/c.cppm` → `b.c`
 
-### 类布局
+### Class Layout
 
 ```cpp
 class StyleRef {
 private:
-    std::string m_file_name;  // 数据成员带 m_ 前缀
+    std::string m_file_name;  // data members with m_ prefix
 
 public:  // Big Five
     StyleRef() = default;
     StyleRef(const StyleRef&) = default;
     // ...
 
-public:  // 公有接口
-    void LoadConfigFile(std::string file_name);  // 函数大驼峰，参数下划线
+public:  // public interface
+    void LoadConfigFile(std::string file_name);  // PascalCase function, snake_case parameter
 
 private:
-    void loadConfigFile(std::string config);  // 私有函数小驼峰
+    void loadConfigFile(std::string config);  // camelCase for private functions
 };
 ```
 
-### 实践规则
+### Practice Rules
 
-- **初始化**：用 `{}` — `int n { 42 }`，`std::vector<int> v { 1, 2, 3 }`
-- **字符串**：只读参数用 `std::string_view`
-- **错误**：用 `std::optional` / `std::expected` 替代 int 错误码
-- **内存**：用 `std::unique_ptr`、`std::shared_ptr`；避免裸 `new`/`delete`
-- **RAII**：将资源与对象生命周期绑定
-- **auto**：用于迭代器、lambda、复杂类型；需要明确表达意图时保留显式类型
-- **宏**：优先用 `constexpr`、`inline`、`concept` 替代宏
+- **Initialization**: use `{}` — `int n { 42 }`, `std::vector<int> v { 1, 2, 3 }`
+- **Strings**: use `std::string_view` for read-only parameters
+- **Errors**: use `std::optional` / `std::expected` instead of int error codes
+- **Memory**: use `std::unique_ptr`, `std::shared_ptr`; avoid raw `new`/`delete`
+- **RAII**: bind resources to object lifetimes
+- **auto**: use for iterators, lambdas, complex types; keep explicit types when intent clarity matters
+- **Macros**: prefer `constexpr`, `inline`, `concept` over macros
 
-### 接口与实现
+### Interface and Implementation
 
-两种写法均支持。
+Both styles are supported.
 
-**写法 A：合并** — 接口与实现同在一个 `.cppm` 中：
+**Style A: Combined** — interface and implementation in a single `.cppm`:
 
 ```cpp
 // mylib.cppm
@@ -106,10 +106,10 @@ export auto add(int a, int b) -> int {
 }
 ```
 
-**写法 B：分离** — 接口在 `.cppm`，实现在 `.cpp`（编译期隐藏实现）：
+**Style B: Separated** — interface in `.cppm`, implementation in `.cpp` (hides implementation at compile time):
 
 ```cpp
-// error.cppm（接口）
+// error.cppm (interface)
 export module error;
 
 export struct Error {
@@ -118,7 +118,7 @@ export struct Error {
 ```
 
 ```cpp
-// error.cpp（实现）
+// error.cpp (implementation)
 module error;
 
 import std;
@@ -128,14 +128,14 @@ auto Error::test() -> void {
 }
 ```
 
-简单模块用写法 A；需隐藏实现或减少编译依赖时用写法 B。
+Use Style A for simple modules; use Style B when hiding implementation or reducing compile dependencies.
 
-## 适用场景
+## Applicable Scenarios
 
-- 编写新的 C++ 代码（模块 `.cppm`/`.cpp` 或头文件 `.hpp`/`.cpp`）
-- 审查或重构项目中的 C++ 代码
-- 用户询问「C++ 风格」「module C++ 风格」或「现代 C++ 惯例」
+- Writing new C++ code (modules `.cppm`/`.cpp` or headers `.hpp`/`.cpp`)
+- Reviewing or refactoring C++ code in a project
+- When the user asks about "C++ style", "module C++ style", or "modern C++ conventions"
 
-## 限制
+## Limitations
 
-对于已存在的项目，除非用户明确要求更改格式，否则本 SKILL 不生效。不要对已有代码主动应用本风格或建议重命名、重构。
+For existing projects, this skill does not apply unless the user explicitly requests format changes. Do not proactively apply this style to existing code or suggest renames/refactoring.
