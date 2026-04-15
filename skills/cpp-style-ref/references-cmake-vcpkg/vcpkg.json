@@ -1,0 +1,6 @@
+{
+    "name": "cpp-style-ref",
+    "version-string": "0.1.0",
+    "description": "C++ style reference project (CMake + vcpkg)",
+    "dependencies": []
+}

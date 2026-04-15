@@ -1,28 +1,38 @@
 ---
 name: cpp-style-ref
-description: 为使用 xmake 构建的 cpp 项目应用编码风格。适用于编写或审查 C++ 代码、命名标识符、组织 .cppm/.cpp 文件，或用户提及 C++ 风格时。
+description: C++ 项目的编码风格参考。根据项目构建方式选择对应参考：xmake 项目参考 references-xmake（C++20 模块），CMake + vcpkg 项目参考 references-cmake-vcpkg（.hpp/.cpp）。适用于编写或审查 C++ 代码、命名标识符、组织模块或头文件，或用户提及 C++ 风格时。
 ---
 
 # cpp-style-ref
 
-cpp 项目的 Modern/Module C++ 风格参考。C++23，使用 `import std`。
+C++ 项目的编码风格参考。根据项目构建方式选择对应的参考目录：
+
+- **xmake** → `references-xmake/`（C++20 模块，`.cppm` / `.cpp`）
+- **CMake + vcpkg** → `references-cmake-vcpkg/`（传统头文件，`.hpp` / `.cpp`）
 
 ## 快速参考
 
 ### 命名
 
-| 种类         | 风格                 | 示例                             |
-| ------------ | -------------------- | -------------------------------- |
-| 类型/类      | PascalCase（大驼峰） | `StyleRef`, `HttpServer`         |
-| 对象/成员    | snake_case（下划线） | `file_name`, `config_text`       |
-| 函数         | snake_case（下划线） | `load_config_file()`, `parse_()` |
-| 私有         | `m_` 前缀            | `m_file_name`, `m_config_text`   |
-| 常量         | UPPER_SNAKE          | `MAX_SIZE`, `DEFAULT_TIMEOUT`    |
-| 全局         | `g_` 前缀            | `g_style_ref`                    |
-| 静态         | `s_` 前缀            | `s_style_ref`                    |
-| 命名空间     | 全小写               | `mcpplibs`, `mylib`              |
-| 多级命名空间 | 全小写               | `mcpp::style_ref`, `mcpp::utils` |
-| 枚举         | PascalCase（大驼峰） | `enum class StyleRef { ... };`   |
+| 种类         | 风格                 | 示例                              |
+| ------------ | -------------------- | --------------------------------- |
+| 类型/类      | PascalCase（大驼峰） | `StyleRef`, `HttpServer`          |
+| 对象/成员    | snake_case（下划线） | `file_name`, `config_text`        |
+| 公有函数     | PascalCase（大驼峰） | `LoadConfigFile()`, `Parse()`     |
+| 私有函数     | camelCase（小驼峰）  | `loadConfigFile()`, `parse()`     |
+| 自由函数     | snake_case（下划线） | `load_config_file()`, `parse_()`  |
+| 私有成员     | `m_` 前缀            | `m_file_name`, `m_config_text`    |
+| 常量         | UPPER_SNAKE          | `MAX_SIZE`, `DEFAULT_TIMEOUT`     |
+| 全局         | `g_` 前缀            | `g_style_ref`                     |
+| 静态         | `s_` 前缀            | `s_style_ref`                     |
+| 命名空间     | 全小写               | `mcpplibs`, `mylib`               |
+| 多级命名空间 | 全小写               | `mcpp::style_ref`, `mcpp::utils`  |
+| 枚举         | PascalCase（大驼峰） | `enum class StyleRef { ... };`    |
+
+### 构建方式
+
+- **xmake** — 原生支持 C++20 模块，使用 `.cppm` / `.cpp`（参考 `references-xmake/`）
+- **CMake + vcpkg** — 传统头文件组织，使用 `.hpp` / `.cpp`（参考 `references-cmake-vcpkg/`）
 
 ### 模块基础
 
@@ -122,6 +132,6 @@ auto Error::test() -> void {
 
 ## 适用场景
 
-- 编写新的 C++ 模块代码（`.cppm`、`.cpp`）
-- 审查或重构 mcpp 项目中的 C++ 代码
-- 用户询问「mcpp 风格」「module C++ 风格」或「现代 C++ 惯例」
+- 编写新的 C++ 代码（模块 `.cppm`/`.cpp` 或头文件 `.hpp`/`.cpp`）
+- 审查或重构项目中的 C++ 代码
+- 用户询问「C++ 风格」「module C++ 风格」或「现代 C++ 惯例」
