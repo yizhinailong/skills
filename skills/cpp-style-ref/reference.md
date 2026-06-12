@@ -36,7 +36,7 @@ private:
 Free functions use snake_case:
 
 ```cpp
-void load_config_file(const std::string& file_name);
+void load_config_file(std::string const& file_name);
 auto parse() -> void;
 ```
 
@@ -271,9 +271,9 @@ private:
 
 public:  // Big Five
     StyleRef() = default;
-    StyleRef(const StyleRef&) = default;
+    StyleRef(StyleRef const&) = default;
     StyleRef(StyleRef&&) = default;
-    auto operator=(const StyleRef&) -> StyleRef& = default;
+    auto operator=(StyleRef const&) -> StyleRef& = default;
     auto operator=(StyleRef&&) -> StyleRef& = default;
     ~StyleRef() = default;
 
@@ -463,3 +463,35 @@ Use for read-only string parameters. Does not own data; the caller must ensure t
 ### RAII
 
 Bind resources to object lifetimes. Use `std::fstream`, `std::lock_guard`, etc.
+
+### `T const&` — Consistent Left-Binding `const` Placement
+
+Always write `T const&` instead of `const T&` for "reference to const".
+
+**Rule**: `const` always modifies what's on its left; if nothing is on the left, it modifies the right. By placing `const` after `T`, we always use the left-binding rule — no exceptions.
+
+**Works uniformly for all `T`**:
+
+```cpp
+// T = int       → int const&        (reference to const int)
+// T = int*      → int* const&       (reference to const pointer — pointer itself immutable)
+// T = int const → int const const&  → collapses to int const&
+```
+
+**Equivalent to `const T&`**, but a single rule ("const binds left") handles all cases. This is especially clear in templates and typedefs:
+
+```cpp
+typedef int* ptr;
+const ptr p;   // p is int* const (many mistakenly read this as const int*)
+ptr const p;   // immediately clear: int* const
+```
+
+**In template deduction**, `const` in `T const&` is a low-level const (qualifying the referent type) and is preserved:
+
+```cpp
+template <typename T>
+void f(T const& x);
+
+int a = 1;
+f(a);  // T = int, x is int const&
+```

@@ -70,7 +70,7 @@ private:
 
 public:  // Big Five
     StyleRef() = default;
-    StyleRef(const StyleRef&) = default;
+    StyleRef(StyleRef const&) = default;
     // ...
 
 public:  // public interface
@@ -89,6 +89,7 @@ private:
 - **Memory**: use `std::unique_ptr`, `std::shared_ptr`; avoid raw `new`/`delete`
 - **RAII**: bind resources to object lifetimes
 - **auto**: use for iterators, lambdas, complex types; keep explicit types when intent clarity matters
+- **`const` placement**: prefer `T const&` over `const T&` — a single left-binding rule covers all types
 - **Macros**: prefer `constexpr`, `inline`, `concept` over macros
 
 ### Interface and Implementation
