@@ -87,6 +87,7 @@ private:
 - **Strings**: use `std::string_view` for read-only parameters
 - **Errors**: use `std::optional` / `std::expected` instead of int error codes
 - **Memory**: use `std::unique_ptr`, `std::shared_ptr`; avoid raw `new`/`delete`
+- **Null checks**: before adding pointer null checks, first verify whether the execution path can actually produce a null pointer; avoid meaningless defensive checks
 - **RAII**: bind resources to object lifetimes
 - **auto**: use for iterators, lambdas, complex types; keep explicit types when intent clarity matters
 - **`const` placement**: prefer `T const&` over `const T&` — a single left-binding rule covers all types

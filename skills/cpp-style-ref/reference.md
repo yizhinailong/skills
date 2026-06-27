@@ -451,6 +451,12 @@ Use for iterators, lambdas, and complex types. Avoid when explicit types improve
 
 `std::make_unique`, `std::make_shared`; avoid raw `new`/`delete`.
 
+### Pointer Null Checks
+
+Before adding a null check for a pointer, first inspect the execution path and ownership contract to determine whether the pointer can actually be null at that point. Do not add meaningless defensive checks when construction, prior validation, or API invariants already guarantee a valid pointer.
+
+Prefer documenting or enforcing non-null invariants at the boundary instead of scattering redundant checks through internal code paths.
+
 ### string_view
 
 Use for read-only string parameters. Does not own data; the caller must ensure the underlying data remains valid.
