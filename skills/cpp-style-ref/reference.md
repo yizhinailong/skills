@@ -451,11 +451,11 @@ Use for iterators, lambdas, and complex types. Avoid when explicit types improve
 
 `std::make_unique`, `std::make_shared`; avoid raw `new`/`delete`.
 
-### Pointer Null Checks
+### Conditional and Defensive Checks
 
-Before adding a null check for a pointer, first inspect the execution path and ownership contract to determine whether the pointer can actually be null at that point. Do not add meaningless defensive checks when construction, prior validation, or API invariants already guarantee a valid pointer.
+Before adding any conditional, guard clause, null check, bounds check, state check, or other defensive validation, first inspect the execution path and relevant contracts to determine whether the check is actually needed at that point.
 
-Prefer documenting or enforcing non-null invariants at the boundary instead of scattering redundant checks through internal code paths.
+Do not add meaningless checks when construction, prior validation, ownership, type constraints, or API invariants already guarantee the condition. Prefer documenting or enforcing invariants at the boundary instead of scattering redundant checks through internal code paths.
 
 ### string_view
 
