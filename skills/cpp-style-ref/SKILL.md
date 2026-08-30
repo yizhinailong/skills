@@ -141,3 +141,5 @@ Use Style A for simple modules; use Style B when hiding implementation or reduci
 ## Limitations
 
 For existing projects, this skill does not apply unless the user explicitly requests format changes. Do not proactively apply this style to existing code or suggest renames/refactoring.
+
+Never create, modify, overwrite, or delete a `.clang-format` file. Treat any existing `.clang-format` as read-only and follow it when formatting C++ code.
