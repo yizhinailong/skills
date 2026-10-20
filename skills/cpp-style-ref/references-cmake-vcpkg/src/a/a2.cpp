@@ -1,11 +1,21 @@
+/**
+ * @file a2.cpp
+ * @brief Implement the public helper and its internal dependency.
+ */
 #include "a/a2.hpp"
+
+#include <print>
+
 #include "a/a1.hpp"
 
 namespace a {
 
-auto FuncA2() -> void {
-    std::println("Function FuncA2 from a/a2");
-    FuncA1();
-}
+    /**
+     * @brief Print a diagnostic and call the internal helper.
+     */
+    auto func_a2() -> void {
+        std::println("Function func_a2 from a/a2");
+        func_a1();
+    }
 
 } // namespace a

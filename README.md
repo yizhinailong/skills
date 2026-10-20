@@ -6,7 +6,7 @@ Reusable skills for AI coding assistants (Claude Code, OpenCode, Cursor, and oth
 
 | Skill | Description |
 |-------|-------------|
-| [cpp-style-ref](skills/cpp-style-ref/) | C++ coding style reference for xmake C++20 modules and CMake + vcpkg header/source projects. Covers naming, module organization, class layout, initialization, error handling, ownership, and modern C++ practice rules. |
+| [cpp-style-ref](skills/cpp-style-ref/) | C++ coding style reference for mcpp C++23 modules, xmake modules, and CMake + vcpkg header/source projects. Covers naming, formatting, Doxygen comments, module organization, class layout, initialization, error handling, and ownership. |
 
 ## Installation
 

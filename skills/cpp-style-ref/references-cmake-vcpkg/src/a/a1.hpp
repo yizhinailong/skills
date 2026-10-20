@@ -1,10 +1,14 @@
-// internal — not part of the public API
+/**
+ * @file a1.hpp
+ * @brief Declare an internal helper outside the public header surface.
+ */
 #pragma once
-
-#include <print>
 
 namespace a {
 
-auto FuncA1() -> void;
+    /**
+     * @brief Print a diagnostic for the internal helper.
+     */
+    auto func_a1() -> void;
 
 } // namespace a

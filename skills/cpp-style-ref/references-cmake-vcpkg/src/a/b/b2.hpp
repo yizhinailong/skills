@@ -1,9 +1,14 @@
+/**
+ * @file b2.hpp
+ * @brief Declare the second helper in a nested namespace.
+ */
 #pragma once
-
-#include <print>
 
 namespace a::b {
 
-auto FuncB2() -> void;
+    /**
+     * @brief Print a diagnostic for the second helper.
+     */
+    auto func_b2() -> void;
 
 } // namespace a::b

@@ -1,15 +1,16 @@
 # cpp-style-ref Reference
 
-Detailed style rules, C++23, using `import std`.
+Detailed style rules based on mcr's C++23 module code. Keep the same naming, formatting, and documentation conventions in each reference; select the source organization that matches the project's build system.
 
 ## 1. Identifier Naming
 
 ### 1.0 Types — PascalCase
 
+Classes, structs, aliases, concepts, and enum types use PascalCase. Preserve standard-required aliases such as `value_type` and `iterator`.
+
 ```cpp
-struct StyleRef {
-    using FileNameType = std::string;
-};
+struct StyleRef;
+using FileNameType = std::string;
 enum class HttpStatus { Ok, NotFound };
 ```
 
@@ -17,65 +18,95 @@ enum class HttpStatus { Ok, NotFound };
 
 ```cpp
 std::string file_name;
-int max_retry_count;
+int max_retry_count{ 3 };
 ```
 
 ### 1.2 Functions
 
-Public functions use PascalCase, private functions use camelCase:
+Public methods use PascalCase; private methods use camelCase. Free helpers use snake_case. Use trailing return types when a function has an ordinary return type.
 
 ```cpp
+/**
+ * @brief Store configuration text.
+ */
 class StyleRef {
 public:
-    void LoadConfigFile(std::string file_name);  // public: PascalCase
+    /**
+     * @brief Validate and copy configuration text.
+     * @param config Text to copy.
+     * @return Success or an invalid-configuration error.
+     */
+    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+
 private:
-    void loadConfigFile(std::string config);     // private: camelCase
+    /**
+     * @brief Copy validated configuration text.
+     * @param config Validated text to copy.
+     */
+    auto loadConfig(std::string_view config) -> void;
 };
+
+/**
+ * @brief Parse configuration text into owned storage.
+ * @param config Input to parse.
+ * @return Parsed text or an error.
+ */
+auto parse_config(std::string_view config) -> Result<std::string>;
 ```
 
-Free functions use snake_case:
-
-```cpp
-void load_config_file(std::string const& file_name);
-auto parse() -> void;
-```
+Preserve established public free-function names, such as mcr's `Get()` and `GetAsync()`. Standard protocol methods such as `begin()`, `end()`, `allocate()`, and coroutine hooks retain their required spelling.
 
 ### 1.3 Private Members — `m_` Prefix
 
-Private data members use the `m_` prefix:
-
 ```cpp
 private:
-    std::string m_file_name;
-    int m_config_text;
+    std::string m_file_name; ///< Owned configuration path.
+    std::string m_config_text; ///< Owned configuration contents.
 ```
 
 ### 1.4 Other Prefixes
 
-- Static members: `s_` prefix — `s_style_ref`
-- Global variables: `g_` prefix — `g_style_ref`, `g_debug`
+- Static data members and persistent function-local statics: `s_`, such as `s_instance`.
+- Global variables: `g_`, such as `g_debug`.
 
 ### 1.5 Constants — UPPER_SNAKE
 
 ```cpp
-constexpr int MAX_SIZE { 1024 };
-constexpr auto DEFAULT_TIMEOUT { 30 };
+constexpr int MAX_SIZE{ 1024 };
+constexpr auto DEFAULT_TIMEOUT{ 30 };
 ```
+
+Enum types use PascalCase. Preserve established enumerator spelling, including upstream constants such as `ErrorCode::OK` and `ErrorCode::FAILED_INIT`.
 
 ### 1.6 Namespaces — All Lowercase
 
+Use lowercase names with underscores where needed. Indent the contents of every namespace by four spaces and retain the closing namespace comment.
+
 ```cpp
-namespace mcpplibs { /* ... */ }
-namespace mcpp::style_ref { /* ... */ }
+namespace style_ref::utils {
+
+    constexpr int MAX_SIZE{ 1024 };
+
+} // namespace style_ref::utils
 ```
 
-### 1.7 Spacing
+### 1.7 Spacing and Formatting
 
-Add spaces around operators for readability: `T x { ... }`, `int n { 42 }`.
+- Use four spaces, never tabs. Opening braces remain on the declaration or control-statement line.
+- Align `public:`, `protected:`, and `private:` with the class declaration; indent their contents one level.
+- Attach pointer and reference symbols to the type: `T*`, `T&`, `T const&`, `char const*`.
+- Write `int n{ 42 }`, `Type{ value }`, and `Type{}`. There is no space before an initializer brace; nonempty initializer braces have inner spaces.
+- Put spaces around binary operators and after commas. Write `if (condition)`, `for (...)`, and `Parse(value)`.
+- Place constructor initializer lists after `:` using braced member initialization. Follow the existing formatter when a list wraps.
+- Do not impose a hard line limit; mcr uses `ColumnLimit: 0`. Wrap long calls and expressions when needed for readability.
 
-### 1.8 Template Naming
+An existing `.clang-format` is authoritative. Treat it as read-only: never create, modify, overwrite, or delete a `.clang-format` file.
 
-Follow class/function naming conventions.
+### 1.8 Template and File Naming
+
+Template type parameters use descriptive PascalCase names or conventional `T`/`Ts`; value parameters follow object naming. Put Doxygen comments before the template declaration.
+
+Source filenames use lowercase words separated by underscores, such as `secure_string.cppm`, `test_config.cpp`, and `error.hpp`.
 
 ---
 
@@ -83,354 +114,172 @@ Follow class/function naming conventions.
 
 ### Module File Structure
 
-```cpp
-module;              // optional global module fragment
-#include <xxx>       // when traditional headers are needed
+Use `import std;` for the standard library in module projects. Traditional third-party headers, when required, belong in a global module fragment before the module declaration.
 
-export module module_name;
-// export import :partition;
-// import :partition;
+```cpp
+/**
+ * @file backend.cppm
+ * @brief Provide a backend module partition.
+ */
+module;
+
+#include <backend.h>
+
+export module style_ref:backend;
 
 import std;
-import xxx;
+import :error;
 
-export auto Add(int a, int b) -> int {
-    return a + b;
-}
+export namespace style_ref {
+
+    // Public declarations and implementations.
+
+} // namespace style_ref
 ```
+
+Omit `module;` when no global-fragment headers or macros are needed. Use `export namespace` to group public declarations, and an ordinary namespace for internal helpers. Do not export implementation helpers just because they share a file with public types.
 
 ### .cppm and .cpp
 
-Use `.cppm` for module interfaces. Use the `export` keyword to export:
-
-```cpp
-export module mcpplibs;
-
-export auto Add(int a, int b) -> int {
-    return a + b;
-}
-```
+- **mcpp:** keep library declarations and implementations together in `src/**/*.cppm`, as in mcr. Tests and executable entry points remain `.cpp` files.
+- **xmake:** use `.cppm` for interfaces and partitions; a separate `.cpp` implementation unit is supported when the project's organization calls for it.
+- **CMake + vcpkg:** follow the existing `.hpp`/`.cpp` layout and use standard headers; do not introduce modules into this reference.
 
 ### Interface and Implementation
 
-**Style A: Combined** — interface and implementation in the same `.cppm`:
+**Style A: Combined** — the mcpp default, with definitions in the interface unit. See [references-mcpp/src/config.cppm](references-mcpp/src/config.cppm).
 
-```cpp
-// mylib.cppm
-export module mylib;
+**Style B: Separated** — a module interface and a non-template implementation unit. See [references-xmake/src/error.cppm](references-xmake/src/error.cppm) and [references-xmake/src/error.cpp](references-xmake/src/error.cpp).
 
-export auto Add(int a, int b) -> int {
-    return a + b;
-}
-```
-
-**Style B: Separated** — interface in `.cppm`, implementation in `.cpp` (hides implementation at compile time):
-
-```cpp
-// error.cppm (interface)
-export module error;
-
-export struct Error {
-    auto Test() -> void;
-};
-```
-
-```cpp
-// error.cpp (implementation)
-module error;
-
-import std;
-
-auto Error::Test() -> void {
-    std::println("Hello");
-}
-```
-
-Use Style A for simple modules; use Style B when hiding implementation or reducing compile dependencies.
+Keep the selected project's layout. Do not split mcpp library code into independent `.cpp` implementation units or move templates out of their required definition context.
 
 ### Multi-File Modules
 
-```
-a/
-├── a1.cppm     # module a:a1 (internal partition)
-├── a2.cppm     # export module a:a2
-├── b/
-│   ├── b1.cppm # export module a.b:b1
-│   └── b2.cppm # export module a.b:b2
-├── b.cppm      # export module a.b
-a.cppm          # export module a
+Organize directories by responsibility. Partition names are independent of file paths:
+
+```text
+src/
+├── style_ref.cppm       # export module style_ref;
+├── config.cppm          # export module style_ref:config;
+└── utils/
+    └── error.cppm       # export module style_ref:error;
+tests/
+└── test_config.cpp      # import style_ref;
 ```
 
-- **Exportable partition**: `export module a:a2;` — can be re-exported
-- **Internal partition**: `module a:a1;` — not exported, internal use only
+The primary interface re-exports the library's public partitions:
 
 ```cpp
-// a.cppm
-export module a;
+/**
+ * @file style_ref.cppm
+ * @brief Re-export the library's public interfaces.
+ */
+export module style_ref;
 
-export import a.b;
-export import :a2;
-
-import std;
-import :a1;
-
-namespace a {
-    export auto FuncA() -> void {
-        std::println("Function FuncA from module a");
-        FuncA1();
-        FuncA2();
-    }
-} // namespace a
+export import :config;
+export import :error;
 ```
 
-```cpp
-// a/a1.cppm — internal partition
-export module a:a1;
+Within a partition, use `import :other;` for implementation dependencies. Use `export import :other;` when the dependency must be visible through that partition's public interface. The mcr convention exposes all library component interfaces through its primary module; follow the chosen library's intended public surface.
 
-import std;
+External consumers use `import style_ref;`, never `import style_ref:config;`. Partitions can only be imported within their own named module.
 
-namespace a {
-    export auto FuncA1() -> void;
-
-    auto FuncA1() -> void {
-        std::println("Function FuncA1 from module a:a1");
-    }
-} // namespace a
-```
-
-```cpp
-// a/a2.cppm — exportable partition
-export module a:a2;
-
-import :a1;
-import std;
-
-namespace a {
-    export auto FuncA2() -> void {
-        std::println("Function FuncA2 from module a:a2");
-        FuncA1();
-    }
-} // namespace a
-```
-
-```cpp
-// a/b/b.cppm
-export module a.b;
-
-export import :b1;
-export import :b2;
-
-import std;
-
-namespace a::b {
-    export auto FuncAb() -> void {
-        std::println("Function FuncAb from module a.b");
-        FuncB1();
-        FuncB2();
-    }
-} // namespace a::b
-```
+An internal implementation partition declares `module style_ref:detail;` and is imported with `import :detail;`; it cannot be re-exported. An interface partition declares `export module style_ref:config;` and may be re-exported. The xmake example's `a:a1` is an interface partition used internally without being re-exported, rather than an implementation partition.
 
 ### Module Naming Rules
 
-- Modules: `topdir.subdir.filename` (e.g., `a.b`, `a.c`)
-- Partitions: `module_name:partition` (e.g., `a:a1`, `a.b:b1`)
-- Use directory paths to distinguish identical names: `a/c.cppm` → `a.c`, `b/c.cppm` → `b.c`
+- Name a library's primary module after its public identity, such as `style_ref`.
+- Name partitions `module_name:component`, such as `style_ref:error`, even when the file is under `src/utils/`.
+- Preserve partition names when moving files; a directory reorganization does not require public module renames.
+- Dotted names such as `a.b` identify separate named modules, as demonstrated by the xmake reference. Use them when the project intentionally exposes distinct modules.
 
-### Forward Compatibility
+### Header Interoperability
 
-Wrap traditional C/C++ headers in a compatibility module:
-
-```cpp
-module;
-
-#include <lua.h>
-// ...
-
-export module lua;
-
-export namespace lua {
-    using lua_State = ::lua_State;
-    // ...
-}
-```
-
-### Miscellaneous
-
-- Prefer `constexpr`, `inline`, `concept` over macros
-- Template static members: use `inline static` (C++17) to ensure a single definition
+Keep C library includes and required macros in the global module fragment, as shown above. Preserve platform-specific handling required by the backend. Do not create compatibility wrappers solely to rename a namespace already available through `import std;`; use `std::filesystem` directly.
 
 ---
 
 ## 3. Class Layout
 
+Group private data first, followed by constructors and special members, the public interface, and private helpers. Access sections may repeat when that grouping improves readability.
+
 ```cpp
+/**
+ * @brief Own validated configuration text.
+ */
 class StyleRef {
 private:
-    std::string m_file_name;  // data members with m_ prefix
+    std::string m_config_text; ///< Owned text, independent of the input view.
 
-public:  // Big Five
+public:
+    /**
+     * @brief Construct an empty configuration holder.
+     */
     StyleRef() = default;
-    StyleRef(StyleRef const&) = default;
-    StyleRef(StyleRef&&) = default;
-    auto operator=(StyleRef const&) -> StyleRef& = default;
-    auto operator=(StyleRef&&) -> StyleRef& = default;
-    ~StyleRef() = default;
 
-public:  // public interface
-    void LoadConfigFile(std::string file_name);  // PascalCase function, snake_case parameter
+    /**
+     * @brief Validate and copy configuration text.
+     * @param config Text to copy; must not be empty.
+     * @return Success or an invalid-configuration error.
+     */
+    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+
+    /**
+     * @brief Borrow the currently stored text.
+     * @return View valid until the holder is changed or destroyed.
+     */
+    [[nodiscard]] auto Text() const noexcept -> std::string_view;
 
 private:
-    void loadConfigFile(std::string config);  // camelCase for private functions
+    /**
+     * @brief Copy already validated text.
+     * @param config Validated text to copy.
+     */
+    auto loadConfig(std::string_view config) -> void;
 };
 ```
+
+Default or delete copy/move operations according to ownership. Do not add all five special members when ordinary member types already provide the correct behavior. Use `explicit`, `[[nodiscard]]`, `const`, and `noexcept` when they express the actual contract; do not mark potentially allocating operations `noexcept`.
 
 ---
 
 ## 4. Build Configuration
 
+Use the matching complete example rather than copying a different build system into an existing project.
+
+### mcpp
+
+See [references-mcpp/mcpp.toml](references-mcpp/mcpp.toml). The library entry is declared with `[lib]` and `path = "src/style_ref.cppm"`. The example has no external dependencies and follows mcr's C++23 `import std;` organization.
+
+From `references-mcpp/`:
+
+```sh
+mcpp build
+mcpp test
+```
+
+Tests are independent `tests/test_*.cpp` programs with their own `main()`. Successful tests return zero; failures return nonzero.
+
 ### xmake
 
-```lua
-add_rules("mode.debug", "mode.release")
+See [references-xmake/xmake.lua](references-xmake/xmake.lua). The sample configures C++26 for its `import std;` toolchain and enables modules. The binary owns the `a`/`a.b` module files; the separated `error` module has its own static-library target, exposes its interface with `add_files("src/error.cppm", {public = true})`, and is linked using `add_deps("error")`.
 
-set_languages("c++26")
-set_rundir("$(projectdir)")
-set_policy("build.c++.modules", true)
+From `references-xmake/`:
 
-target("mylib", function ()
-    set_kind("binary")
-
-    add_files("src/main.cpp")
-    add_files("**.cppm")
-end)
-
--- separated modules need a separate target
-target("error", function ()
-    set_kind("static")
-
-    add_files("src/error.cppm")
-    add_files("src/error.cpp")
-end)
+```sh
+xmake
+xmake run cpp-style-ref
 ```
 
 ### CMake + vcpkg (.hpp/.cpp)
 
-**CMakeLists.txt**
+See [references-cmake-vcpkg/CMakeLists.txt](references-cmake-vcpkg/CMakeLists.txt), [CMakePresets.json](references-cmake-vcpkg/CMakePresets.json), and [vcpkg.json](references-cmake-vcpkg/vcpkg.json).
 
-```cmake
-cmake_minimum_required(VERSION 3.25)
+Keep declarations in headers using `#pragma once` and definitions in `.cpp`. Include each implementation's own header and the standard headers it needs. The sample uses C++23 and provides matching configure/build presets.
 
-project(cpp-style-ref LANGUAGES CXX)
+With `VCPKG_ROOT` pointing to the existing vcpkg installation, run from `references-cmake-vcpkg/`:
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# --- error library (separated: .hpp declaration + .cpp implementation) ---
-add_library(error STATIC
-    src/error.cpp
-)
-target_include_directories(error PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-# --- main program ---
-add_executable(cpp-style-ref
-    src/main.cpp
-    src/a/a1.cpp
-    src/a/a2.cpp
-    src/a/b/b1.cpp
-    src/a/b/b2.cpp
-)
-target_include_directories(cpp-style-ref PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(cpp-style-ref PRIVATE error)
-```
-
-**File Structure**
-
-```
-src/
-├── main.cpp
-├── error.hpp           # struct Error declaration
-├── error.cpp           # Error implementation
-└── a/
-    ├── a1.hpp          # internal — not part of public API
-    ├── a1.cpp
-    ├── a2.hpp
-    ├── a2.cpp
-    └── b/
-        ├── b1.hpp
-        ├── b1.cpp
-        ├── b2.hpp
-        ├── b2.cpp
-```
-
-**error.hpp** — declaration
-
-```cpp
-#pragma once
-
-struct Error {
-    auto Test() -> void;
-};
-```
-
-**error.cpp** — implementation
-
-```cpp
-#include "error.hpp"
-#include <print>
-
-auto Error::Test() -> void {
-    std::println("Hello");
-}
-```
-
-**vcpkg.json**
-
-```json
-{
-    "name": "cpp-style-ref",
-    "version-string": "0.1.0",
-    "dependencies": []
-}
-```
-
-**CMakePresets.json** (vcpkg toolchain integration)
-
-```json
-{
-    "version": 6,
-    "configurePresets": [
-        {
-            "name": "vcpkg",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-                    "type": "FILEPATH"
-                }
-            }
-        },
-        {
-            "name": "debug",
-            "displayName": "Debug",
-            "inherits": "vcpkg",
-            "binaryDir": "${sourceDir}/build/debug",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
-        },
-        {
-            "name": "release",
-            "displayName": "Release",
-            "inherits": "vcpkg",
-            "binaryDir": "${sourceDir}/build/release",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
-        }
-    ]
-}
-```
-
-Build commands:
-
-```bash
+```sh
 cmake --preset debug
 cmake --build --preset debug
 ```
@@ -439,65 +288,77 @@ cmake --build --preset debug
 
 ## 5. Practice Reference
 
-### auto
+### auto and Return Types
 
-Use for iterators, lambdas, and complex types. Avoid when explicit types improve clarity.
+Use `auto` for iterators, lambdas, and complex types; retain explicit types when they clarify intent. Use `auto Name(...) -> ReturnType` for functions with ordinary return types. Constructors, destructors, and conversion operators retain their language-required syntax.
 
 ### Brace Initialization
 
-`int n { 42 }`, `std::vector<int> v { 1, 2, 3 }`, `Point p { 10, 20 }`.
+Prefer `int n{ 42 }`, `std::vector<int> v{ 1, 2, 3 }`, and `Point p{ 10, 20 }`. Preserve parentheses when needed to select the intended overload, such as constructing a vector of a given size rather than an initializer list.
 
-### Smart Pointers
+### Smart Pointers and RAII
 
-`std::make_unique`, `std::make_shared`; avoid raw `new`/`delete`.
+Use `std::make_unique` for exclusive ownership and `std::make_shared` for shared ownership. Bind resources to object lifetimes, using RAII wrappers and custom deleters for C handles. Raw pointers and views may express borrowing; avoid raw `new`/`delete` unless an existing lifecycle contract requires them.
 
 ### Conditional and Defensive Checks
 
-Before adding any conditional, guard clause, null check, bounds check, state check, or other defensive validation, first inspect the execution path and relevant contracts to determine whether the check is actually needed at that point.
+Before adding a conditional, guard clause, null check, bounds check, state check, or other defensive validation, inspect the execution path and relevant contracts to determine whether the check can affect behavior.
 
-Do not add meaningless checks when construction, prior validation, ownership, type constraints, or API invariants already guarantee the condition. Prefer documenting or enforcing invariants at the boundary instead of scattering redundant checks through internal code paths.
+Do not repeat checks already guaranteed by construction, prior validation, ownership, type constraints, or API invariants. Validate external inputs and fallible backend results at the boundary, and preserve required cleanup and platform checks.
 
 ### string_view
 
-Use for read-only string parameters. Does not own data; the caller must ensure the underlying data remains valid.
+Use `std::string_view` for borrowed read-only string parameters. Document lifetimes when a view is stored or returned. Copy into owned storage when the data must outlive the call; do not pass `view.data()` to APIs requiring null termination without satisfying that contract.
 
 ### optional / expected
 
-- `std::optional`: values that may or may not be present
-- `std::expected` (C++23): returns a value on success or an error
+- Use `std::optional<T>` for a value that may be absent.
+- Use `std::expected<T, Error>` or a `Result<T>` alias for recoverable operation failures, including `Result<void>`.
+- Return `std::unexpected{ Error{ ... } }` on failure and `{}` for successful `Result<void>`.
+- Inspect a result before accessing its value. Preserve diagnostics when propagating an error, using `std::unexpected{ std::move(result.error()) }` when ownership can transfer.
+- Document exceptions that remain part of the contract; `std::expected` does not make allocations non-throwing.
 
-### RAII
+### `T const&` — Consistent const Placement
 
-Bind resources to object lifetimes. Use `std::fstream`, `std::lock_guard`, etc.
-
-### `T const&` — Consistent Left-Binding `const` Placement
-
-Always write `T const&` instead of `const T&` for "reference to const".
-
-**Rule**: `const` always modifies what's on its left; if nothing is on the left, it modifies the right. By placing `const` after `T`, we always use the left-binding rule — no exceptions.
-
-**Works uniformly for all `T`**:
+Place `const` after the type it qualifies. Write `std::string const&`, `char const*`, and `T* const` as appropriate.
 
 ```cpp
-// T = int       → int const&        (reference to const int)
-// T = int*      → int* const&       (reference to const pointer — pointer itself immutable)
-// T = int const → int const const&  → collapses to int const&
+using Pointer = int*;
+// Pointer const is a const pointer; int const* points to a const int.
 ```
 
-**Equivalent to `const T&`**, but a single rule ("const binds left") handles all cases. This is especially clear in templates and typedefs:
+### Macros and Static Members
+
+Prefer `constexpr`, `inline`, templates, and concepts over macros when they express the same behavior. Preserve macros required for platform and C-library interoperability. Use `inline static` for class static data defined in the class when appropriate.
+
+---
+
+## 6. Doxygen Documentation
+
+Start C++ source, module, and header files with `@file` and `@brief`. Document public interfaces, internal helpers, and test helpers using the same multiline block layout:
 
 ```cpp
-typedef int* ptr;
-const ptr p;   // p is int* const (many mistakenly read this as const int*)
-ptr const p;   // immediately clear: int* const
+/**
+ * @file result.cppm
+ * @brief Provide an expected-based result alias.
+ */
+export module style_ref:result;
+
+import std;
+import :error;
+
+export namespace style_ref {
+
+    /**
+     * @brief Represent an operation's value or error.
+     * @tparam T Success value type; void means no value is returned.
+     */
+    template <typename T = void>
+    using OperationResult = std::expected<T, Error>;
+
+} // namespace style_ref
 ```
 
-**In template deduction**, `const` in `T const&` is a low-level const (qualifying the referent type) and is preserved:
+Keep `/**` and `*/` on their own lines, and begin content lines with ` * `. Even a single `@brief` uses the multiline form. Place the comment immediately before the declaration and before `template` or attributes when present.
 
-```cpp
-template <typename T>
-void f(T const& x);
-
-int a = 1;
-f(a);  // T = int, x is int const&
-```
+Use `@tparam`, `@param`, `@return`, `@throws`, and `@note` only when relevant, with each tag on its own line. Describe ownership, borrowed lifetimes, preconditions, and remaining exceptions where they affect callers. Use trailing `///<` for members and enumerators; implementation explanations and namespace closing labels may use ordinary `//` comments.

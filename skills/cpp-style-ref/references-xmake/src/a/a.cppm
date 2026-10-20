@@ -1,3 +1,7 @@
+/**
+ * @file a.cppm
+ * @brief Re-export public components and use an internal interface partition.
+ */
 export module a;
 
 export import a.b;
@@ -8,13 +12,13 @@ import :a1;
 
 namespace a {
 
-    // error: exporting 'void a::FuncA1@a:a1()' that does not have external linkage
-    // export using a::FuncA1;
-
-    export auto FuncA() -> void {
-        std::println("Function FuncA from module a");
-        FuncA1();
-        FuncA2();
+    /**
+     * @brief Run the primary module's public and internal helpers.
+     */
+    export auto func_a() -> void {
+        std::println("Function func_a from module a");
+        func_a1();
+        func_a2();
     }
 
 } // namespace a

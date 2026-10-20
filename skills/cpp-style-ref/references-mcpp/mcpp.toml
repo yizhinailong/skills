@@ -1,0 +1,8 @@
+[package]
+name = "cpp_style_ref"
+version = "0.1.0"
+description = "C++23 module style reference with documented configuration and results"
+license = "MIT"
+
+[lib]
+path = "src/style_ref.cppm"
