@@ -7,7 +7,7 @@ Reusable skills for AI coding assistants (Claude Code, OpenCode, Cursor, and oth
 | Skill                                  | Description                                                                                                                                                                                                                                |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [cpp-style-ref](skills/cpp-style-ref/) | C++ coding style reference for mcpp C++23 modules, xmake modules, and CMake + vcpkg header/source projects. Covers naming, formatting, Doxygen comments, module organization, class layout, initialization, error handling, and ownership. |
-| [git-style-ref](skills/git-style-ref/) | Git commit message style reference derived from mcr history. Covers English imperative subjects, types, scopes, explanatory bodies, and breaking changes.                                                                                  |
+| [git-commit-style-ref](skills/git-commit-style-ref/) | Git commit message style reference derived from mcr history. Covers English imperative subjects, types, scopes, explanatory bodies, and breaking changes.                                                                                  |
 
 
 ## Installation

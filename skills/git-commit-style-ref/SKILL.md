@@ -1,9 +1,9 @@
 ---
-name: git-style-ref
+name: git-commit-style-ref
 description: "Git commit message style reference derived from mcr history. Use when drafting, reviewing, or creating commit messages in this style, including type and scope selection, English imperative subjects, explanatory bodies, and breaking changes. Preserve explicit user instructions and established repository conventions."
 ---
 
-# git-style-ref
+# git-commit-style-ref
 
 Write commit messages in the style established by `mcr`: an English Conventional Commit subject followed, when useful, by an explanatory body. Apply this reference when requested or when the target repository has no conflicting convention. This skill covers commit messages; it does not prescribe branch names, merge strategies, or release automation.
 
