@@ -39,10 +39,25 @@ Preserve established public API names, including PascalCase free entry points su
 - Attach `*` and `&` to the type: `char const*`, `StyleRef&`. Use `T const&` for references to const.
 - Use `value{ 42 }`, `Type{ value }`, and `value{}`; do not add a space before the opening initializer brace.
 - Prefer trailing return types: `[[nodiscard]] auto Parse() const noexcept -> Result<void>`.
-- Follow the existing `.clang-format`; do not impose a separate line limit. The reference style uses `ColumnLimit: 0`.
+- Follow the existing `.clang-format`; do not impose a general line limit. The reference style uses `ColumnLimit: 0`, but function signatures still follow the 100-column wrapping rule below.
 - Start C++ files with a multiline Doxygen block containing `@file` and `@brief`.
 - Document types, functions, templates, and test helpers with multiline `/** ... */` blocks immediately before the declaration; put template documentation before `template`.
 - Put `@brief`, `@tparam`, `@param`, `@return`, `@throws`, and `@note` on separate lines as applicable. Use trailing `///<` for members and enumerators, and ordinary `//` for implementation notes and namespace endings.
+
+### Function Signature Wrapping
+
+Wrap a signature when its single-line form, measured from the return type through the opening `{` or terminating `;` (including indentation, excluding trailing comments and an empty `{}` body), exceeds 100 columns. This applies to definitions, declarations, constructors, destructors, and operators. Break immediately after `(`, put one parameter per line indented one level with no trailing comma, and put `)` on its own line at the declaration's indentation followed by qualifiers, the trailing return type, and `{` or `;`. Keep default arguments and inline parameter comments with their parameter, and keep `->` on the `)` line.
+
+```cpp
+auto Result::get_header_value(
+    std::string const& key,
+    char const* def
+) const -> std::string {
+    ...
+}
+```
+
+Do not wrap signatures that fit within 100 columns, empty parameter lists, lambdas, calls, or control statements. Leave `// clang-format off` regions unchanged. `ColumnLimit: 0` means clang-format preserves this layout but will not create it: wrap manually, then run `clang-format -i <file>` to verify the result is stable.
 
 ### Build Systems
 

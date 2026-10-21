@@ -98,11 +98,33 @@ namespace style_ref::utils {
 - Write `int n{ 42 }`, `Type{ value }`, and `Type{}`. There is no space before an initializer brace; nonempty initializer braces have inner spaces.
 - Put spaces around binary operators and after commas. Write `if (condition)`, `for (...)`, and `Parse(value)`.
 - Place constructor initializer lists after `:` using braced member initialization. Follow the existing formatter when a list wraps.
-- Do not impose a hard line limit; mcr uses `ColumnLimit: 0`. Wrap long calls and expressions when needed for readability.
+- Do not impose a general line limit; mcr uses `ColumnLimit: 0`. Wrap long calls and expressions when needed for readability. Function signatures follow the 100-column wrapping rule in the next section.
 
 An existing `.clang-format` is authoritative. Treat it as read-only: never create, modify, overwrite, or delete a `.clang-format` file.
 
-### 1.8 Template and File Naming
+### 1.8 Function Signature Wrapping
+
+Wrap a function signature when its single-line form exceeds 100 columns, including leading indentation. Measure from the return type through the opening `{`, or through the terminating `;` for declarations; exclude trailing comments and an empty `{}` body. Apply the rule to definitions, declarations, constructors, destructors, and operators.
+
+Use block style for the wrapped signature:
+
+- Break immediately after `(`.
+- Put exactly one parameter per line, indented one level from the declaration. Do not pack parameters together and do not add a trailing comma.
+- Put `)` on its own line at the declaration's indentation, followed by qualifiers, the trailing return type, and `{` or `;`.
+- Keep default arguments and inline parameter comments on their parameter's line. Keep the trailing return type on the `)` line; do not break before `->`.
+
+```cpp
+auto Result::get_header_value(
+    std::string const& key,
+    char const* def
+) const -> std::string {
+    ...
+}
+```
+
+Do not wrap signatures that fit within 100 columns, empty parameter lists, lambda expressions, calls, or control statements. Leave `// clang-format off` regions unchanged. `.clang-format` sets `ColumnLimit: 0`, so clang-format preserves this layout but does not create it; apply the wrapping manually and run `clang-format -i <file>` to verify it is stable.
+
+### 1.9 Template and File Naming
 
 Template type parameters use descriptive PascalCase names or conventional `T`/`Ts`; value parameters follow object naming. Put Doxygen comments before the template declaration.
 
