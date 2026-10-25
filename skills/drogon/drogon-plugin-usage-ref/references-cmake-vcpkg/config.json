@@ -1,0 +1,70 @@
+{
+  "app": {
+    "number_of_threads": 2,
+    "document_root": "/tmp/plugin-demo-example",
+    "upload_path": "uploads",
+    "log": {
+      "log_path": "",
+      "logfile_base_name": "",
+      "log_size_limit": 100000000,
+      "log_level": "INFO"
+    }
+  },
+  "listeners": [
+    {
+      "address": "127.0.0.1",
+      "port": 18080
+    }
+  ],
+  "plugins": [
+    {
+      "name": "drogon::plugin::Redirector"
+    },
+    {
+      "name": "drogon::plugin::SlashRemover",
+      "dependencies": ["drogon::plugin::Redirector"],
+      "config": {
+        "remove_trailing_slashes": true,
+        "remove_duplicate_slashes": true,
+        "redirect": true
+      }
+    },
+    {
+      "name": "drogon::plugin::RealIpResolver",
+      "config": {
+        "trust_ips": ["127.0.0.1"],
+        "from_header": "x-forwarded-for"
+      }
+    },
+    {
+      "name": "drogon::plugin::Hodor",
+      "dependencies": ["drogon::plugin::RealIpResolver"],
+      "config": {
+        "urls": ["^/guests/.*"],
+        "time_unit": 60,
+        "ip_capacity": 3,
+        "use_real_ip_resolver": true
+      }
+    },
+    {
+      "name": "drogon::plugin::AccessLogger",
+      "config": {
+        "log_path": "",
+        "use_real_ip": true
+      }
+    },
+    {
+      "name": "drogon_greeter::Greeter",
+      "config": {
+        "greeting": "Hello"
+      }
+    },
+    {
+      "name": "plugin_demo::GuestBook",
+      "dependencies": ["drogon_greeter::Greeter"],
+      "config": {
+        "first_number": 1
+      }
+    }
+  ]
+}

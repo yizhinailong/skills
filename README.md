@@ -9,6 +9,7 @@ Reusable skills for AI coding assistants (Claude Code, OpenCode, Cursor, and oth
 | [cpp-style-ref](skills/cpp-style-ref/) | C++ coding style reference for mcpp C++23 modules, xmake modules, and CMake + vcpkg header/source projects. Covers naming, formatting, Doxygen comments, module organization, class layout, initialization, error handling, and ownership. |
 | [git-commit-style-ref](skills/git-commit-style-ref/) | Git commit message style reference derived from mcr history. Covers English imperative subjects, types, scopes, explanatory bodies, breaking changes, and no attribution trailers.                                                                                  |
 | [drogon-plugin-lib-ref](skills/drogon/drogon-plugin-lib-ref/) | Drogon plugin library reference for `drogon::Plugin<T>` libraries built with CMake + vcpkg. Covers registration, lifecycle, and threading as implemented in drogon 1.9.13, config and secrets, coroutine APIs returning `std::expected`, packaging, tests, and the implementation workflow, with a buildable skeleton. |
+| [drogon-plugin-usage-ref](skills/drogon/drogon-plugin-usage-ref/) | Drogon plugin usage reference for drogon apps built with CMake + vcpkg. Covers built-in plugins, third-party plugin libraries, and in-project plugins as implemented in drogon 1.9.13: registration, dependencies, `getPlugin` timing, static-link registration, thread safety, startup checks, and tests, with a buildable app. |
 
 
 ## Installation

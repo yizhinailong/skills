@@ -104,4 +104,4 @@ drogon-<x>/
 
 ## Limitations
 
-This skill covers plugin libraries, not the applications that consume them. Its drogon behavior was verified against drogon 1.9.13 and trantor 1.5.28; recheck [reference.md](reference.md) after a drogon upgrade. In an existing plugin project, follow its established conventions unless the user asks for changes.
+This skill covers plugin libraries, not the applications that consume them; use `drogon-plugin-usage-ref` for those. Its drogon behavior was verified against drogon 1.9.13 and trantor 1.5.28; recheck [reference.md](reference.md) after a drogon upgrade. In an existing plugin project, follow its established conventions unless the user asks for changes.
