@@ -1,4 +1,4 @@
-# drogon-plugins Reference
+# drogon-plugin-lib-ref Reference
 
 The drogon behavior below was read from drogon 1.9.13 as installed by vcpkg (source under `$VCPKG_ROOT/buildtrees/drogon/src/v1.9.13-*/`), with trantor 1.5.28. Paths are relative to that source tree. Changes in drogon 1.9.14 are noted where they affect plugins. The skeleton in `references-cmake-vcpkg/` was built and run against these versions with Clang 21.1.8 and CMake 4.2.
 

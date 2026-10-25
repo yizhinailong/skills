@@ -1,9 +1,9 @@
 ---
-name: drogon-plugins
+name: drogon-plugin-lib-ref
 description: "Drogon plugin library reference for drogon::Plugin<T> libraries built with CMake + vcpkg and consumed by other drogon apps. Covers plugin registration, lifecycle, and threading as implemented in drogon 1.9.13, config.json and secret handling, coroutine-only APIs returning std::expected, per-request HttpClient transports, add_subdirectory and find_package packaging, test programs, AGENTS.md and docs, and the implementation workflow. Use when creating, extending, or reviewing a drogon plugin library; preserve existing project conventions unless changes are requested."
 ---
 
-# drogon-plugins
+# drogon-plugin-lib-ref
 
 Build drogon plugin libraries: `drogon::Plugin<T>` classes that other drogon apps link, register in their config.json, and fetch with `app().getPlugin<T>()`. This skill records drogon's plugin behavior as implemented in drogon 1.9.13, and the conventions and workflow the user established in `drogon-llm`.
 
