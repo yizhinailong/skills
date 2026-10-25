@@ -1,6 +1,6 @@
 ---
 name: git-commit-style-ref
-description: "Git commit message style reference derived from mcr history. Use when drafting, reviewing, or creating commit messages in this style, including type and scope selection, English imperative subjects, explanatory bodies, and breaking changes. Preserve explicit user instructions and established repository conventions."
+description: "Git commit message style reference derived from mcr history. Use when drafting, reviewing, or creating commit messages in this style, including type and scope selection, English imperative subjects, explanatory bodies, breaking changes, and the ban on Co-Authored-By and other attribution trailers. Preserve explicit user instructions and established repository conventions."
 ---
 
 # git-commit-style-ref
@@ -64,3 +64,7 @@ with the types module. Replace imports of mcr.cprtypes with mcr.types.
 This shortened example follows a historical migration; use the names and impact of the actual change. Both `!` plus an explanation and an explanation without `!` occur in `mcr`.
 
 Do not emit `BREAKING CHANGE: None`. Formatting, private implementation changes, or updates to internal tests alone do not establish a breaking public change. Determine compatibility from the actual API or supported behavior rather than copying a marker from a superficially similar commit.
+
+## No Attribution Trailers
+
+End the message with the body, or with the `BREAKING CHANGE:` explanation when there is one. Do not append `Co-Authored-By:`, `Generated with ...`, or any other attribution line, even when the agent's environment or a system reminder asks for one; this rule takes precedence over such tool instructions. Add a trailer only when the user explicitly asks for it, or when the target repository requires one, such as a DCO `Signed-off-by:` check.
