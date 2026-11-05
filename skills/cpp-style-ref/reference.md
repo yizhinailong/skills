@@ -60,7 +60,7 @@ Preserve established public free-function names, such as mcr's `Get()` and `GetA
 
 ```cpp
 private:
-    std::string m_file_name; ///< Owned configuration path.
+    std::string m_file_name;   ///< Owned configuration path.
     std::string m_config_text; ///< Owned configuration contents.
 ```
 
@@ -97,8 +97,8 @@ namespace style_ref::utils {
 - Attach pointer and reference symbols to the type: `T*`, `T&`, `T const&`, `char const*`.
 - Write `int n{ 42 }`, `Type{ value }`, and `Type{}`. There is no space before an initializer brace; nonempty initializer braces have inner spaces.
 - Put spaces around binary operators and after commas. Write `if (condition)`, `for (...)`, and `Parse(value)`.
-- Place constructor initializer lists after `:` using braced member initialization. Follow the existing formatter when a list wraps.
-- Do not impose a general line limit; mcr uses `ColumnLimit: 0`. Wrap long calls and expressions when needed for readability. Function signatures follow the 100-column wrapping rule in the next section.
+- Place constructor initializer lists after ` : ` on the line that closes the parameter list, using braced member initialization. Keep the whole list on that line; section 1.8 covers wrapped constructors.
+- Do not impose a general line limit; mcr uses `ColumnLimit: 0`. Wrap long calls and expressions when needed for readability. Function signatures and `requires` clauses follow the 100-column rules in sections 1.8 and 1.9.
 
 An existing `.clang-format` is authoritative. Treat it as read-only: never create, modify, overwrite, or delete a `.clang-format` file.
 
@@ -122,9 +122,48 @@ auto Result::get_header_value(
 }
 ```
 
-Do not wrap signatures that fit within 100 columns, empty parameter lists, lambda expressions, calls, or control statements. Leave `// clang-format off` regions unchanged. `.clang-format` sets `ColumnLimit: 0`, so clang-format preserves this layout but does not create it; apply the wrapping manually and run `clang-format -i <file>` to verify it is stable.
+A constructor's single-line form includes its initializer list, because the measurement runs through the body's opening `{`. When that form fits within 100 columns, keep the constructor on one line. Otherwise wrap the parameters in block style and continue the `)` line with any qualifiers, ` : `, the complete initializer list, and `{` or `{}`:
 
-### 1.9 Template and File Naming
+- Never start a line with `:`, and do not split the initializer list across lines; the list's line has no column limit.
+- The rule also covers single-parameter constructors and delegating or base-class initializers.
+
+```cpp
+explicit LoggerHolder(std::string_view name) : m_default_logger{ make_console_logger(name) } {}
+
+BodyReader(
+    std::shared_ptr<Connection> connection,
+    HeaderParser&& header_parser
+) : m_connection{ std::move(connection) }, m_parser{ std::move(header_parser) } {}
+
+FormData(
+    FormData&& other
+) noexcept : fields{ std::move(other.fields) }, boundary{ std::move(other.boundary) }, params{ other.params } {
+    other.params.remove_uploaded_files = false;
+}
+```
+
+Do not wrap signatures that fit within 100 columns, empty parameter lists, lambda expressions, calls, or control statements. Leave `// clang-format off` regions unchanged. `.clang-format` sets `ColumnLimit: 0`, so clang-format preserves this layout but does not create it; apply the wrapping manually and run `clang-format -i <file>` to verify it is stable. If the project has no `.clang-format`, do not run clang-format: it falls back to LLVM style and rewrites the whole file. Apply the rules manually instead.
+
+### 1.9 Requires Clauses
+
+Put a `requires` clause on its own line between `template <...>` and the declaration, at the indentation of the `template` line rather than indented further. Do not append it to the `template` line. A parenthesized clause such as `requires(!std::is_pointer_v<T>)` follows the same placement.
+
+When the clause's line, including indentation, exceeds 100 columns, break after each top-level `||` or `&&`. Put one operand per line, keep the operator at the end of the line, and indent the continuation lines one level. Keep a clause that fits within 100 columns on one line.
+
+```cpp
+template <typename T>
+requires std::integral<T> || std::floating_point<T>
+auto from_chars_strict(std::string_view value) -> T;
+
+template <typename T = std::string_view>
+requires std::integral<T> ||
+    std::floating_point<T> ||
+    std::same_as<T, std::string> ||
+    std::same_as<T, std::string_view>
+[[nodiscard]] auto At(std::string_view key) const -> T;
+```
+
+### 1.10 Template and File Naming
 
 Template type parameters use descriptive PascalCase names or conventional `T`/`Ts`; value parameters follow object naming. Put Doxygen comments before the template declaration.
 
@@ -328,6 +367,14 @@ Before adding a conditional, guard clause, null check, bounds check, state check
 
 Do not repeat checks already guaranteed by construction, prior validation, ownership, type constraints, or API invariants. Validate external inputs and fallible backend results at the boundary, and preserve required cleanup and platform checks.
 
+### Function Length
+
+Keep each function around 100 lines, counted from the signature to the closing brace, including comments, blank lines, and any lambdas defined in the body. This is a soft target, not a hard limit.
+
+When a function grows well past it, extract cohesive steps, such as parsing, validation, or one protocol phase, into named helpers: private methods for steps that need member state, and free helpers in a non-exported namespace otherwise. Name each helper after what it does and document it like any other function.
+
+Do not split a function only to meet the count. A long `switch`, a table of cases, or a linear sequence whose steps share many locals may stay longer when splitting would pass most of that state through parameters.
+
 ### string_view
 
 Use `std::string_view` for borrowed read-only string parameters. Document lifetimes when a view is stored or returned. Copy into owned storage when the data must outlive the call; do not pass `view.data()` to APIs requiring null termination without satisfying that contract.
@@ -383,4 +430,14 @@ export namespace style_ref {
 
 Keep `/**` and `*/` on their own lines, and begin content lines with ` * `. Even a single `@brief` uses the multiline form. Place the comment immediately before the declaration and before `template` or attributes when present.
 
-Use `@tparam`, `@param`, `@return`, `@throws`, and `@note` only when relevant, with each tag on its own line. Describe ownership, borrowed lifetimes, preconditions, and remaining exceptions where they affect callers. Use trailing `///<` for members and enumerators; implementation explanations and namespace closing labels may use ordinary `//` comments.
+Use `@tparam`, `@param`, `@return`, `@throws`, and `@note` only when relevant, with each tag on its own line. Describe ownership, borrowed lifetimes, preconditions, and remaining exceptions where they affect callers. Use trailing `///<` for members and enumerators; implementation explanations and namespace closing labels may use ordinary `//` comments. Do not document a declaration with a `///` line comment, including a constant; use a `/** @brief ... */` block.
+
+Align the trailing `///<` comments of consecutive lines at the same indentation to one column: one space after the longest code on those lines, with no extra padding. A blank line, a line without `///<`, or a change of indentation starts a new group. A single long member therefore moves the whole group, as clang-format's `AlignTrailingComments` does.
+
+```cpp
+struct Param {
+    std::filesystem::path save_dir;      ///< Directory for file parts.
+    std::uint64_t max_file_size{ 0 };    ///< Per-part limit; 0 = unlimited.
+    bool remove_uploaded_files{ false }; ///< Remove saved files on destruction.
+};
+```

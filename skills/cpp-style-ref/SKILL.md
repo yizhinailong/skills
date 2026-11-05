@@ -39,10 +39,11 @@ Preserve established public API names, including PascalCase free entry points su
 - Attach `*` and `&` to the type: `char const*`, `StyleRef&`. Use `T const&` for references to const.
 - Use `value{ 42 }`, `Type{ value }`, and `value{}`; do not add a space before the opening initializer brace.
 - Prefer trailing return types: `[[nodiscard]] auto Parse() const noexcept -> Result<void>`.
-- Follow the existing `.clang-format`; do not impose a general line limit. The reference style uses `ColumnLimit: 0`, but function signatures still follow the 100-column wrapping rule below.
+- Follow the existing `.clang-format`; do not impose a general line limit. The reference style uses `ColumnLimit: 0`, but function signatures and `requires` clauses still follow the 100-column rules below.
 - Start C++ files with a multiline Doxygen block containing `@file` and `@brief`.
 - Document types, functions, templates, and test helpers with multiline `/** ... */` blocks immediately before the declaration; put template documentation before `template`.
-- Put `@brief`, `@tparam`, `@param`, `@return`, `@throws`, and `@note` on separate lines as applicable. Use trailing `///<` for members and enumerators, and ordinary `//` for implementation notes and namespace endings.
+- Put `@brief`, `@tparam`, `@param`, `@return`, `@throws`, and `@note` on separate lines as applicable. Use trailing `///<` for members and enumerators, and ordinary `//` for implementation notes and namespace endings. Never document a declaration, including a constant, with a `///` line comment.
+- Align the `///<` comments of consecutive same-indentation lines one space after the longest code in the group; a blank line or a line without `///<` starts a new group.
 
 ### Function Signature Wrapping
 
@@ -57,7 +58,30 @@ auto Result::get_header_value(
 }
 ```
 
-Do not wrap signatures that fit within 100 columns, empty parameter lists, lambdas, calls, or control statements. Leave `// clang-format off` regions unchanged. `ColumnLimit: 0` means clang-format preserves this layout but will not create it: wrap manually, then run `clang-format -i <file>` to verify the result is stable.
+Constructors measure through the body's `{`, so the initializer list counts. A constructor that fits stays on one line. Otherwise block-wrap the parameters and continue the `)` line with qualifiers, ` : `, the whole initializer list, and `{` or `{}`. Never start a line with `:` or split the list.
+
+```cpp
+FormData(
+    FormData&& other
+) noexcept : fields{ std::move(other.fields) }, boundary{ std::move(other.boundary) }, params{ other.params } {
+    other.params.remove_uploaded_files = false;
+}
+```
+
+Do not wrap signatures that fit within 100 columns, empty parameter lists, lambdas, calls, or control statements. Leave `// clang-format off` regions unchanged. `ColumnLimit: 0` means clang-format preserves this layout but will not create it: wrap manually, then run `clang-format -i <file>` to verify the result is stable. Without a `.clang-format`, skip that run, because clang-format would fall back to LLVM style and rewrite the file.
+
+### Requires Clauses
+
+Put a `requires` clause on its own line at the indentation of its `template` line. When the clause exceeds 100 columns, break after each top-level `||` or `&&`, one operand per line, with continuation lines indented one level.
+
+```cpp
+template <typename T = std::string_view>
+requires std::integral<T> ||
+    std::floating_point<T> ||
+    std::same_as<T, std::string> ||
+    std::same_as<T, std::string_view>
+[[nodiscard]] auto At(std::string_view key) const -> T;
+```
 
 ### Build Systems
 
@@ -131,6 +155,7 @@ Keep data and ownership state together, then constructors/special members, the p
 - **Errors**: use `std::optional` for an absent value and `std::expected<T, Error>` for recoverable failures; a `Result<T>` alias may name the latter
 - **Memory**: use `std::unique_ptr`, `std::shared_ptr`; avoid raw `new`/`delete`
 - **Checks**: before adding any conditional or defensive check, first verify whether the execution path can actually require it; avoid meaningless checks that cannot affect behavior
+- **Function length**: keep a function around 100 lines; when one grows well beyond that, extract cohesive steps into named helpers, but do not split code only to meet the count
 - **RAII**: bind resources to object lifetimes
 - **Filesystem**: use `std::filesystem` directly when `import std;` already provides it
 - **auto**: use for iterators, lambdas, complex types; keep explicit types when intent clarity matters
