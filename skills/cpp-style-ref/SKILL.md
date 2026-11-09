@@ -59,9 +59,6 @@ When comments are requested, use this format:
  * @brief Store owned configuration text.
  */
 class StyleRef {
-private:
-    std::string m_config_text; ///< Owned configuration text.
-
 public:
     /**
      * @brief Validate and copy configuration text.
@@ -69,6 +66,9 @@ public:
      * @return Success or an invalid-configuration error.
      */
     [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+
+private:
+    std::string m_config_text; ///< Owned configuration text.
 };
 ```
 
@@ -146,18 +146,21 @@ Inside a partition, use `import :other;` for implementation dependencies and `ex
 
 ```cpp
 class StyleRef {
+public:
+    StyleRef() = default;
+
+    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+
+    [[nodiscard]] auto Text() const noexcept -> std::string_view;
+
 private:
     std::string m_config_text;
 
-public:
-    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
-
-private:
     auto loadConfig(std::string_view config) -> void;
 };
 ```
 
-Keep data and ownership state together, then constructors/special members, the public interface, and private helpers. Default or delete special members according to ownership; do not add them solely to fill out the Big Five.
+Put the public section first: constructors/special members, then the public interface. Follow it with the private section: data and ownership state, then private helpers. Access sections may repeat when that grouping improves readability. Default or delete special members according to ownership; do not add them solely to fill out the Big Five.
 
 ### Practice Rules
 

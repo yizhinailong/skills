@@ -13,9 +13,6 @@ export namespace style_ref {
      * @brief Validate and own configuration text independently of input views.
      */
     class StyleRef {
-    private:
-        std::string m_config_text; ///< Owned configuration text.
-
     public:
         /**
          * @brief Construct an empty configuration holder.
@@ -48,6 +45,8 @@ export namespace style_ref {
         }
 
     private:
+        std::string m_config_text; ///< Owned configuration text.
+
         /**
          * @brief Copy text after boundary validation.
          * @param config Validated text to copy.

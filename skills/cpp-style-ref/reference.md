@@ -239,13 +239,10 @@ Keep C library includes and required macros in the global module fragment, as sh
 
 ## 3. Class Layout
 
-Group private data first, followed by constructors and special members, the public interface, and private helpers. Access sections may repeat when that grouping improves readability.
+Put the public section first: constructors and special members, then the public interface. Follow it with the private section: data and ownership state, then private helpers. Access sections may repeat when that grouping improves readability.
 
 ```cpp
 class StyleRef {
-private:
-    std::string m_config_text;
-
 public:
     StyleRef() = default;
 
@@ -254,6 +251,8 @@ public:
     [[nodiscard]] auto Text() const noexcept -> std::string_view;
 
 private:
+    std::string m_config_text;
+
     auto loadConfig(std::string_view config) -> void;
 };
 ```
