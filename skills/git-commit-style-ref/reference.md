@@ -125,6 +125,26 @@ docs: update request option examples
 
 Use this shape for related consequences of one purpose. It does not require multiple headings for a small change or combining unrelated work into one commit.
 
+## Splitting Combined Commits
+
+The history contains combined commits: `835e0c4` pairs its `feat(api)` change with separate `docs`, `refactor(ssl)`, `refactor(options)`, and `refactor(utils)` work. The commit size rule in `SKILL.md` prefers separate commits for parts that can land independently, so do not copy that grouping for new work.
+
+The following is an illustrative example, not historical commits. Instead of one commit:
+
+```text
+feat(api): add request timeouts, fix header parsing, and format session code
+```
+
+make three, ordered so that the mechanical change comes first:
+
+```text
+refactor(session): format session code with multiline syntax
+fix(utils): keep empty header values when parsing responses
+feat(api): add per-request timeout option
+```
+
+Each commit gets its own body describing only its change. Tests and documentation for the timeout option belong in the `feat(api)` commit, and tests for the parsing fix in the `fix(utils)` commit.
+
 ## Historical Exceptions to Avoid Copying
 
 - `9f06a26` includes `BREAKING CHANGE: None` for formatting. Omit the marker when no real incompatibility exists.
