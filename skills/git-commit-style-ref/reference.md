@@ -2,6 +2,8 @@
 
 This reference was derived from all 116 commits reachable from `mcr` HEAD at `1c1de309f067eace00eaad563c5ddccd9fb6dae2`. Commit hashes below identify the source examples. They document a historical snapshot, not requirements to retain obsolete module names or implementation behavior.
 
+These observations are fallback defaults. When committing to another repository, its own commit history defines the format; follow the history wherever it establishes a pattern and use this reference only for gaps.
+
 ## Observed Conventions
 
 - 115 subjects use `type: summary`, `type(scope): summary`, or the breaking variant with `!`. The initial `Initial commit` is the only exception.

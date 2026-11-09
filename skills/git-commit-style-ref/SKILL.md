@@ -1,13 +1,22 @@
 ---
 name: git-commit-style-ref
-description: "Git commit message style reference derived from mcr history. Use when drafting, reviewing, or creating commits in this style, including splitting work into small single-purpose commits, type and scope selection, English imperative subjects, explanatory bodies, breaking changes, and the ban on Co-Authored-By and other attribution trailers. Preserve explicit user instructions and established repository conventions."
+description: "Git commit message style reference derived from mcr history. Use when drafting, reviewing, or creating commits in this style, including splitting work into small single-purpose commits, type and scope selection, English imperative subjects, explanatory bodies, breaking changes, and the ban on Co-Authored-By and other attribution trailers. Prefer the target repository's established commit history over this reference's defaults and preserve explicit user instructions."
 ---
 
 # git-commit-style-ref
 
-Write commit messages in the style established by `mcr`: an English Conventional Commit subject followed, when useful, by an explanatory body. Apply this reference when requested or when the target repository has no conflicting convention. This skill covers commit messages and how to split work into commits; it does not prescribe branch names, merge strategies, or release automation.
+These are default rules derived from `mcr` history: an English Conventional Commit subject followed, when useful, by an explanatory body. **The target repository's existing commit history takes precedence.** When its established format differs from this reference, copy the history and use these rules only where the history is silent or inconsistent. This skill covers commit messages and how to split work into commits; it does not prescribe branch names, merge strategies, or release automation.
 
 Read [reference.md](reference.md) when choosing between overlapping types, handling a multi-area change, or checking historical examples and exceptions. The reference is self-contained; using this skill does not require a checkout of `mcr`.
+
+## Fit the Repository History
+
+Before drafting a message, inspect how the repository already writes commits and follow that format:
+
+- Run `git log` for the affected paths and for the repository as a whole, and note the subject shape, type and scope vocabulary, language, and body style.
+- Match the dominant pattern, even when it differs from the rules below. A repository that always writes a body, omits scopes, uses different type names, or writes in another language overrides the corresponding default.
+- Fall back to this reference only where the history has no clear precedent, and do not "correct" an established convention toward these rules.
+- Explicit user instructions still override both the history and this reference.
 
 ## Commit Size
 
@@ -25,7 +34,7 @@ Follow an explicit instruction to make a single commit, and treat changes the us
 
 ## Draft from the Selected Changes
 
-Base the message on the changes being described. For a staged commit, inspect `git diff --cached`; use `git diff` for unstaged changes and inspect untracked files when they are part of the requested commit. Check nearby commit messages for the target area's vocabulary and scope names.
+Base the message on the changes being described. For a staged commit, inspect `git diff --cached`; use `git diff` for unstaged changes and inspect untracked files when they are part of the requested commit. Match the repository history as described in [Fit the Repository History](#fit-the-repository-history), including the target area's vocabulary and scope names.
 
 Identify the main purpose and any actual caller incompatibility before choosing a prefix. Describe the resulting change rather than listing files. When asked only for a message, return ready-to-use message text; when asked only for a subject, omit the body.
 
