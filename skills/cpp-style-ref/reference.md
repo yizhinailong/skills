@@ -2,6 +2,8 @@
 
 Detailed style rules based on mcr's C++23 module code. Keep the same naming, formatting, and documentation conventions in each reference; select the source organization that matches the project's build system.
 
+Write code without comments by default. Section 6 defines when comments are added and the format they use. The examples outside section 6 omit documentation comments; the sample projects in `references-*/` are fully commented to show the requested format.
+
 ## 1. Identifier Naming
 
 ### 1.0 Types — PascalCase
@@ -26,31 +28,14 @@ int max_retry_count{ 3 };
 Public methods use PascalCase; private methods use camelCase. Free helpers use snake_case. Use trailing return types when a function has an ordinary return type.
 
 ```cpp
-/**
- * @brief Store configuration text.
- */
 class StyleRef {
 public:
-    /**
-     * @brief Validate and copy configuration text.
-     * @param config Text to copy.
-     * @return Success or an invalid-configuration error.
-     */
     [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
 
 private:
-    /**
-     * @brief Copy validated configuration text.
-     * @param config Validated text to copy.
-     */
     auto loadConfig(std::string_view config) -> void;
 };
 
-/**
- * @brief Parse configuration text into owned storage.
- * @param config Input to parse.
- * @return Parsed text or an error.
- */
 auto parse_config(std::string_view config) -> Result<std::string>;
 ```
 
@@ -60,8 +45,8 @@ Preserve established public free-function names, such as mcr's `Get()` and `GetA
 
 ```cpp
 private:
-    std::string m_file_name;   ///< Owned configuration path.
-    std::string m_config_text; ///< Owned configuration contents.
+    std::string m_file_name;
+    std::string m_config_text;
 ```
 
 ### 1.4 Other Prefixes
@@ -165,7 +150,7 @@ requires std::integral<T> ||
 
 ### 1.10 Template and File Naming
 
-Template type parameters use descriptive PascalCase names or conventional `T`/`Ts`; value parameters follow object naming. Put Doxygen comments before the template declaration.
+Template type parameters use descriptive PascalCase names or conventional `T`/`Ts`; value parameters follow object naming. When comments are requested, put the Doxygen block before the template declaration.
 
 Source filenames use lowercase words separated by underscores, such as `secure_string.cppm`, `test_config.cpp`, and `error.hpp`.
 
@@ -178,10 +163,6 @@ Source filenames use lowercase words separated by underscores, such as `secure_s
 Use `import std;` for the standard library in module projects. Traditional third-party headers, when required, belong in a global module fragment before the module declaration.
 
 ```cpp
-/**
- * @file backend.cppm
- * @brief Provide a backend module partition.
- */
 module;
 
 #include <backend.h>
@@ -231,10 +212,6 @@ tests/
 The primary interface re-exports the library's public partitions:
 
 ```cpp
-/**
- * @file style_ref.cppm
- * @brief Re-export the library's public interfaces.
- */
 export module style_ref;
 
 export import :config;
@@ -265,37 +242,18 @@ Keep C library includes and required macros in the global module fragment, as sh
 Group private data first, followed by constructors and special members, the public interface, and private helpers. Access sections may repeat when that grouping improves readability.
 
 ```cpp
-/**
- * @brief Own validated configuration text.
- */
 class StyleRef {
 private:
-    std::string m_config_text; ///< Owned text, independent of the input view.
+    std::string m_config_text;
 
 public:
-    /**
-     * @brief Construct an empty configuration holder.
-     */
     StyleRef() = default;
 
-    /**
-     * @brief Validate and copy configuration text.
-     * @param config Text to copy; must not be empty.
-     * @return Success or an invalid-configuration error.
-     */
     [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
 
-    /**
-     * @brief Borrow the currently stored text.
-     * @return View valid until the holder is changed or destroyed.
-     */
     [[nodiscard]] auto Text() const noexcept -> std::string_view;
 
 private:
-    /**
-     * @brief Copy already validated text.
-     * @param config Validated text to copy.
-     */
     auto loadConfig(std::string_view config) -> void;
 };
 ```
@@ -371,13 +329,13 @@ Do not repeat checks already guaranteed by construction, prior validation, owner
 
 Keep each function around 100 lines, counted from the signature to the closing brace, including comments, blank lines, and any lambdas defined in the body. This is a soft target, not a hard limit.
 
-When a function grows well past it, extract cohesive steps, such as parsing, validation, or one protocol phase, into named helpers: private methods for steps that need member state, and free helpers in a non-exported namespace otherwise. Name each helper after what it does and document it like any other function.
+When a function grows well past it, extract cohesive steps, such as parsing, validation, or one protocol phase, into named helpers: private methods for steps that need member state, and free helpers in a non-exported namespace otherwise. Name each helper after what it does.
 
 Do not split a function only to meet the count. A long `switch`, a table of cases, or a linear sequence whose steps share many locals may stay longer when splitting would pass most of that state through parameters.
 
 ### string_view
 
-Use `std::string_view` for borrowed read-only string parameters. Document lifetimes when a view is stored or returned. Copy into owned storage when the data must outlive the call; do not pass `view.data()` to APIs requiring null termination without satisfying that contract.
+Use `std::string_view` for borrowed read-only string parameters. When comments are requested, document the lifetime of a stored or returned view. Copy into owned storage when the data must outlive the call; do not pass `view.data()` to APIs requiring null termination without satisfying that contract.
 
 ### optional / expected
 
@@ -385,7 +343,7 @@ Use `std::string_view` for borrowed read-only string parameters. Document lifeti
 - Use `std::expected<T, Error>` or a `Result<T>` alias for recoverable operation failures, including `Result<void>`.
 - Return `std::unexpected{ Error{ ... } }` on failure and `{}` for successful `Result<void>`.
 - Inspect a result before accessing its value. Preserve diagnostics when propagating an error, using `std::unexpected{ std::move(result.error()) }` when ownership can transfer.
-- Document exceptions that remain part of the contract; `std::expected` does not make allocations non-throwing.
+- `std::expected` does not make allocations non-throwing. When comments are requested, document exceptions that remain part of the contract.
 
 ### `T const&` — Consistent const Placement
 
@@ -402,9 +360,23 @@ Prefer `constexpr`, `inline`, templates, and concepts over macros when they expr
 
 ---
 
-## 6. Doxygen Documentation
+## 6. Comments and Doxygen Documentation
 
-Start C++ source, module, and header files with `@file` and `@brief`. Document public interfaces, internal helpers, and test helpers using the same multiline block layout:
+### When to Comment
+
+Write code without comments by default. Do not add `@file` headers, Doxygen blocks, trailing `///<` member comments, or `//` implementation notes on your own initiative.
+
+Add comments only when the user, project instructions such as `AGENTS.md`, or another active skill explicitly asks for them. Comment only what the request covers, such as one function, the public interface, or a whole file, and use the format below.
+
+These rules do not apply to:
+
+- Closing namespace comments such as `} // namespace style_ref`, which are part of the formatting described in section 1.6.
+- Tool directives such as `// clang-format off`.
+- Existing comments. Do not delete them, and keep them accurate when changing the code they describe.
+
+### Format
+
+When comments are requested, start C++ source, module, and header files with `@file` and `@brief`. Document public interfaces, internal helpers, and test helpers using the same multiline block layout:
 
 ```cpp
 /**

@@ -1,6 +1,6 @@
 ---
 name: cpp-style-ref
-description: "C++ coding style reference for mcpp C++23 modules, xmake modules, and CMake + vcpkg header/source projects. Covers naming, formatting, Doxygen comments, and module organization. Use for new C++ code, requested style reviews or format changes, or questions about C++ style; preserve existing project conventions unless style changes are requested."
+description: "C++ coding style reference for mcpp C++23 modules, xmake modules, and CMake + vcpkg header/source projects. Covers naming, formatting, module organization, and the Doxygen comment format used only when comments are requested. Use for new C++ code, requested style reviews or format changes, or questions about C++ style; preserve existing project conventions unless style changes are requested."
 ---
 
 # cpp-style-ref
@@ -10,6 +10,8 @@ C++ coding style reference. Read [reference.md](reference.md) for detailed rules
 - **mcpp** → [references-mcpp/](references-mcpp/) (C++23 modules, combined declarations and implementations in `.cppm`)
 - **xmake** → [references-xmake/](references-xmake/) (modules, `.cppm` / `.cpp`; the example targets C++26 for `import std;` support)
 - **CMake + vcpkg** → [references-cmake-vcpkg/](references-cmake-vcpkg/) (traditional headers, `.hpp` / `.cpp`)
+
+The reference sources are fully commented to show the format for requested comments. Follow their code, and leave out their comments unless comments are requested (see [Comments](#comments)).
 
 ## Quick Reference
 
@@ -33,17 +35,42 @@ C++ coding style reference. Read [reference.md](reference.md) for detailed rules
 
 Preserve established public API names, including PascalCase free entry points such as `Get()` and `GetAsync()`, standard protocol names such as `begin()` and `allocate()`, and upstream enum values such as `ErrorCode::OK`.
 
-### Formatting and Documentation
+### Formatting
 
 - Use four spaces, no tabs, attached opening braces, and indentation inside namespaces; align access labels with the class declaration.
 - Attach `*` and `&` to the type: `char const*`, `StyleRef&`. Use `T const&` for references to const.
 - Use `value{ 42 }`, `Type{ value }`, and `value{}`; do not add a space before the opening initializer brace.
 - Prefer trailing return types: `[[nodiscard]] auto Parse() const noexcept -> Result<void>`.
 - Follow the existing `.clang-format`; do not impose a general line limit. The reference style uses `ColumnLimit: 0`, but function signatures and `requires` clauses still follow the 100-column rules below.
+
+### Comments
+
+Write code without comments by default: no `@file` headers, Doxygen blocks, `///<` member comments, or `//` implementation notes. Add comments only when the user, project instructions such as `AGENTS.md`, or another active skill explicitly asks for them, and comment only what the request covers. Closing namespace comments such as `} // namespace style_ref` are part of the formatting and stay; so do `// clang-format off` directives. Do not delete existing comments, and keep them accurate when changing the code they describe.
+
+When comments are requested, use this format:
+
 - Start C++ files with a multiline Doxygen block containing `@file` and `@brief`.
 - Document types, functions, templates, and test helpers with multiline `/** ... */` blocks immediately before the declaration; put template documentation before `template`.
-- Put `@brief`, `@tparam`, `@param`, `@return`, `@throws`, and `@note` on separate lines as applicable. Use trailing `///<` for members and enumerators, and ordinary `//` for implementation notes and namespace endings. Never document a declaration, including a constant, with a `///` line comment.
+- Put `@brief`, `@tparam`, `@param`, `@return`, `@throws`, and `@note` on separate lines as applicable. Use trailing `///<` for members and enumerators, and ordinary `//` for implementation notes. Never document a declaration, including a constant, with a `///` line comment.
 - Align the `///<` comments of consecutive same-indentation lines one space after the longest code in the group; a blank line or a line without `///<` starts a new group.
+
+```cpp
+/**
+ * @brief Store owned configuration text.
+ */
+class StyleRef {
+private:
+    std::string m_config_text; ///< Owned configuration text.
+
+public:
+    /**
+     * @brief Validate and copy configuration text.
+     * @param config Text to copy; must not be empty.
+     * @return Success or an invalid-configuration error.
+     */
+    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+};
+```
 
 ### Function Signature Wrapping
 
@@ -100,10 +127,6 @@ requires std::integral<T> ||
 ### Module Structure
 
 ```cpp
-/**
- * @file style_ref.cppm
- * @brief Re-export the library's public partitions.
- */
 export module style_ref;
 
 export import :config;
@@ -122,26 +145,14 @@ Inside a partition, use `import :other;` for implementation dependencies and `ex
 ### Class Layout
 
 ```cpp
-/**
- * @brief Store owned configuration text.
- */
 class StyleRef {
 private:
-    std::string m_config_text; ///< Owned configuration text.
+    std::string m_config_text;
 
 public:
-    /**
-     * @brief Validate and copy configuration text.
-     * @param config Text to copy; must not be empty.
-     * @return Success or an invalid-configuration error.
-     */
     [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
 
 private:
-    /**
-     * @brief Copy configuration text after validation.
-     * @param config Validated text to copy.
-     */
     auto loadConfig(std::string_view config) -> void;
 };
 ```
@@ -169,18 +180,8 @@ Choose according to the project. The mcpp reference follows the combined style u
 **Style A: Combined** — interface and implementation in a single `.cppm`:
 
 ```cpp
-/**
- * @file mylib.cppm
- * @brief Provide a small arithmetic module.
- */
 export module mylib;
 
-/**
- * @brief Add two integers.
- * @param a First operand.
- * @param b Second operand.
- * @return Sum of the operands.
- */
 export auto add(int a, int b) -> int {
     return a + b;
 }
@@ -189,35 +190,18 @@ export auto add(int a, int b) -> int {
 **Style B: Separated** — interface in `.cppm`, implementation in `.cpp` (hides implementation at compile time):
 
 ```cpp
-/**
- * @file error.cppm
- * @brief Declare a diagnostic example.
- */
 export module error;
 
-/**
- * @brief Print a diagnostic message.
- */
 export struct Error {
-    /**
-     * @brief Print a greeting.
-     */
     auto Test() -> void;
 };
 ```
 
 ```cpp
-/**
- * @file error.cpp
- * @brief Implement the diagnostic example.
- */
 module error;
 
 import std;
 
-/**
- * @brief Print a greeting.
- */
 auto Error::Test() -> void {
     std::println("Hello");
 }
