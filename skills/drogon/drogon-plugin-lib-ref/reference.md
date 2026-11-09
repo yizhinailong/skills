@@ -90,6 +90,6 @@ On 2026-10-25, a copy of `references-cmake-vcpkg/` gave these results:
 
 ## 8. Differences from `drogon-llm`
 
-- `drogon-llm` declares private data after the public interface. The skeleton follows `cpp-style-ref` and puts private data first.
+- `drogon-llm` declares private data after the public interface, while the skeleton places it before the public interface.
 - `drogon-llm` names the plugin `LlmClient`, the handle `Llm`, and the factory `NewLlmClient()`. The skeleton keeps that pattern as `EchoClient`, `Echo`, and `NewEchoClient()`.
 - `drogon-llm` requires a `model` key and uses DeepSeek in its tests. The skeleton requires only `base_url` and tests against a handler served by the same app, so it runs offline.
