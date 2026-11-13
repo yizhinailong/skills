@@ -1,15 +1,19 @@
 /**
  * @file error.cppm
- * @brief Declare a class with a separate module implementation.
+ * @brief Declare and implement a class in a combined module interface.
  */
 export module error;
 
+import std;
+
 /**
- * @brief Provide a diagnostic method implemented in a separate unit.
+ * @brief Provide a diagnostic method.
  */
 export struct Error {
     /**
      * @brief Print a greeting.
      */
-    auto Test() -> void;
+    auto Test() -> void {
+        std::println("Hello");
+    }
 };

@@ -183,15 +183,13 @@ Omit `module;` when no global-fragment headers or macros are needed. Use `export
 
 ### .cppm and .cpp
 
-- **mcpp:** keep library declarations and implementations together in `src/**/*.cppm`; modules do not require a separate implementation unit. The primary module unit is `src/<package>.cppm`, and test cases live in `tests/*.cpp`. The `mcpp new -t lib` template also generates an optional `.cpp` implementation unit when a project chooses to separate non-template definitions.
-- **xmake:** use `.cppm` for interfaces and partitions; a separate `.cpp` implementation unit is supported when the project's organization calls for it.
+- **mcpp:** keep library declarations and implementations together in `src/**/*.cppm`; modules do not require a separate implementation unit. The primary module unit is `src/<package>.cppm`, and test cases live in `tests/*.cpp`.
+- **xmake:** keep declarations and implementations together in `.cppm` for interfaces and partitions; the sample's `error` module is a combined interface unit.
 - **CMake + vcpkg:** follow the existing `.hpp`/`.cpp` layout and use standard headers; do not introduce modules into this reference.
 
 ### Interface and Implementation
 
-**Style A: Combined** — the mcpp default, with interface and definitions in a single `.cppm`, because modules do not require a separate implementation unit. See [references-mcpp/src/config.cppm](references-mcpp/src/config.cppm).
-
-**Style B: Separated** — a module interface and a non-template implementation unit. See [references-xmake/src/error.cppm](references-xmake/src/error.cppm) and [references-xmake/src/error.cpp](references-xmake/src/error.cpp); use it only when a project chooses to separate or hide implementations.
+Keep declarations and definitions in a single `.cppm`, because modules do not require a separate implementation unit. See [references-mcpp/src/config.cppm](references-mcpp/src/config.cppm) and [references-xmake/src/error.cppm](references-xmake/src/error.cppm).
 
 Keep the selected project's layout. Do not move template definitions out of their required definition context.
 
@@ -279,7 +277,7 @@ Tests are `tests/**/*.cpp` files that declare `mcpplibs.mtest` cases as `UTest` 
 
 ### xmake
 
-See [references-xmake/xmake.lua](references-xmake/xmake.lua). The sample configures C++26 for its `import std;` toolchain and enables modules. The binary owns the `a`/`a.b` module files; the separated `error` module has its own static-library target, exposes its interface with `add_files("src/error.cppm", {public = true})`, and is linked using `add_deps("error")`.
+See [references-xmake/xmake.lua](references-xmake/xmake.lua). The sample configures C++26 for its `import std;` toolchain and enables modules. The binary owns the `a`/`a.b` module files; the combined `error` module has its own static-library target, exposes its interface with `add_files("src/error.cppm", {public = true})`, and is linked using `add_deps("error")`.
 
 From `references-xmake/`:
 

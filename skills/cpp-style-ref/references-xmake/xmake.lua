@@ -9,7 +9,6 @@ target(
         set_kind("static")
 
         add_files("src/error.cppm", {public = true})
-        add_files("src/error.cpp")
     end
 )
 

@@ -8,7 +8,7 @@ description: "C++ coding style reference for mcpp C++23 modules, xmake modules, 
 C++ coding style reference. Read [reference.md](reference.md) for detailed rules, then select only the reference directory matching the project's build system:
 
 - **mcpp** → [references-mcpp/](references-mcpp/) (C++23 modules, declarations and implementations together in `.cppm`)
-- **xmake** → [references-xmake/](references-xmake/) (modules, `.cppm` / `.cpp`; the example targets C++26 for `import std;` support)
+- **xmake** → [references-xmake/](references-xmake/) (modules in `.cppm`; the example targets C++26 for `import std;` support)
 - **CMake + vcpkg** → [references-cmake-vcpkg/](references-cmake-vcpkg/) (traditional headers, `.hpp` / `.cpp`)
 
 The reference sources are fully commented to show the format for requested comments. Follow their code, and leave out their comments unless comments are requested (see [Comments](#comments)).
@@ -113,13 +113,13 @@ requires std::integral<T> ||
 ### Build Systems
 
 - **mcpp** — `mcpp.toml`, C++23 modules with `import std;`, library declarations and implementations together in `.cppm`, and `mcpplibs.mtest` cases in `tests/*.cpp` (see `references-mcpp/`)
-- **xmake** — module support, uses `.cppm` / `.cpp`; use the standard and toolchain configured by the project (see `references-xmake/`)
+- **xmake** — module support with `.cppm` files; use the standard and toolchain configured by the project (see `references-xmake/`)
 - **CMake + vcpkg** — traditional header organization, uses `.hpp` / `.cpp` (see `references-cmake-vcpkg/`)
 
 ### Module Basics
 
 - Use `import std;` for the standard library in module projects; use standard headers in the CMake + vcpkg examples
-- Keep declarations and implementations together in `.cppm`: modules do not require separate declaration and implementation units, so mcpp library code stays in one file. A `.cpp` module implementation unit is optional
+- Keep declarations and implementations together in `.cppm`: modules do not require separate declaration and implementation units, so library code stays in one file
 - `export module module_name;` — module declaration
 - `export import :partition;` — export partition
 - `import :partition;` — import a partition without re-exporting it
@@ -178,39 +178,17 @@ Put the public section first: constructors/special members, then the public inte
 
 ### Interface and Implementation
 
-Choose according to the project. Module interfaces do not require a separate implementation unit, so the mcpp reference keeps both in `.cppm`; the xmake reference also demonstrates an optional separated implementation.
-
-**Style A: Combined** — interface and implementation in a single `.cppm`. This is the mcpp default:
+Keep a module's declarations and implementations in a single `.cppm`. Module interfaces do not require a separate implementation unit, so the mcpp and xmake references each use one file per module:
 
 ```cpp
 export module mylib;
+
+import std;
 
 export auto add(int a, int b) -> int {
     return a + b;
 }
 ```
-
-**Style B: Separated** — declarations in `.cppm`, non-template definitions in a `.cpp` module implementation unit (hides implementation at compile time). Use it only when a project chooses to separate or hide implementations:
-
-```cpp
-export module error;
-
-export struct Error {
-    auto Test() -> void;
-};
-```
-
-```cpp
-module error;
-
-import std;
-
-auto Error::Test() -> void {
-    std::println("Hello");
-}
-```
-
-Use Style A for mcpp library code. Use Style B only when the project already separates implementations or needs to hide them.
 
 ## Applicable Scenarios
 
