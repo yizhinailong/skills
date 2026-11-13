@@ -1,11 +1,11 @@
 /**
  * @file config.cppm
- * @brief Own validated configuration text in a combined module interface.
+ * @brief Declare validated configuration text owned by a module interface.
  */
 export module style_ref:config;
 
-export import :error;
 import std;
+export import :error;
 
 export namespace style_ref {
 
@@ -26,23 +26,13 @@ export namespace style_ref {
          * @throws std::bad_alloc If text or diagnostic allocation fails.
          * @throws std::length_error If the input exceeds string capacity.
          */
-        [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void> {
-            if (config.empty()) {
-                return std::unexpected{
-                    Error{ ErrorCode::InvalidConfig, "Configuration text must not be empty." }
-                };
-            }
-            loadConfig(config);
-            return {};
-        }
+        [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
 
         /**
          * @brief Borrow the stored configuration text.
          * @return View valid until this holder is changed or destroyed.
          */
-        [[nodiscard]] auto Text() const noexcept -> std::string_view {
-            return m_config_text;
-        }
+        [[nodiscard]] auto Text() const noexcept -> std::string_view;
 
     private:
         std::string m_config_text; ///< Owned configuration text.
@@ -51,9 +41,7 @@ export namespace style_ref {
          * @brief Copy text after boundary validation.
          * @param config Validated text to copy.
          */
-        auto loadConfig(std::string_view config) -> void {
-            m_config_text.assign(config);
-        }
+        auto loadConfig(std::string_view config) -> void;
     };
 
 } // namespace style_ref

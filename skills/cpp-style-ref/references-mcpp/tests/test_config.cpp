@@ -3,46 +3,41 @@
  * @brief Verify owned text, error diagnostics, and state preservation through the public module.
  */
 import std;
+import mcpplibs.mtest;
 import style_ref;
 
-namespace {
-
-    /**
-     * @brief Report a failed behavioral expectation.
-     * @param condition Whether the expectation holds.
-     * @param message Failure diagnostic.
-     * @return Whether the expectation holds.
-     */
-    auto check(bool condition, std::string_view message) -> bool {
-        if (!condition) {
-            std::println("test_config: {}", message);
-        }
-        return condition;
-    }
-
-} // namespace
+using namespace mcpplibs::mtest;
 
 /**
- * @brief Verify configuration behavior without importing partitions directly.
- * @return Zero when all checks pass, otherwise one.
+ * @brief Verify a default holder owns no text.
  */
-auto main() -> int {
+UTest default_text{"a default holder owns no text", [] {
     style_ref::StyleRef config;
-    bool passed{ check(config.Text().empty(), "default text must be empty") };
+    expect(config.Text().empty());
+}};
 
+/**
+ * @brief Verify accepted text is copied into owned storage.
+ */
+UTest owns_text{"accepted text is copied, not borrowed", [] {
+    style_ref::StyleRef config;
     std::string input{ "mode=debug" };
-    auto const loaded = config.LoadConfig(input);
-    passed &= check(loaded.has_value(), "nonempty text must load successfully");
+    expect(config.LoadConfig(input).has_value());
     input.assign("changed");
-    passed &= check(config.Text() == "mode=debug", "stored text must own its bytes");
+    expect(eq(config.Text(), std::string_view{ "mode=debug" }));
+}};
 
-    auto const rejected = config.LoadConfig("");
-    passed &= check(!rejected, "empty text must be rejected");
+/**
+ * @brief Verify rejection reports invalid configuration and preserves the previous text.
+ */
+UTest rejects_empty{"empty text is rejected and the previous text preserved", [] {
+    style_ref::StyleRef config;
+    expect(config.LoadConfig("mode=debug").has_value());
+    auto const rejected{ config.LoadConfig("") };
+    expect(!rejected.has_value());
     if (!rejected) {
-        passed &= check(rejected.error().code == style_ref::ErrorCode::InvalidConfig, "failure must identify invalid configuration");
-        passed &= check(!rejected.error().message.empty(), "failure must retain a diagnostic");
+        expect(rejected.error().code == style_ref::ErrorCode::InvalidConfig);
+        expect(!rejected.error().message.empty());
     }
-    passed &= check(config.Text() == "mode=debug", "rejection must preserve the previous text");
-
-    return passed ? 0 : 1;
-}
+    expect(eq(config.Text(), std::string_view{ "mode=debug" }));
+}};

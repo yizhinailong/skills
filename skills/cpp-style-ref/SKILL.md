@@ -7,7 +7,7 @@ description: "C++ coding style reference for mcpp C++23 modules, xmake modules, 
 
 C++ coding style reference. Read [reference.md](reference.md) for detailed rules, then select only the reference directory matching the project's build system:
 
-- **mcpp** → [references-mcpp/](references-mcpp/) (C++23 modules, combined declarations and implementations in `.cppm`)
+- **mcpp** → [references-mcpp/](references-mcpp/) (C++23 modules, interface `.cppm` and implementation `.cpp` units)
 - **xmake** → [references-xmake/](references-xmake/) (modules, `.cppm` / `.cpp`; the example targets C++26 for `import std;` support)
 - **CMake + vcpkg** → [references-cmake-vcpkg/](references-cmake-vcpkg/) (traditional headers, `.hpp` / `.cpp`)
 
@@ -112,14 +112,14 @@ requires std::integral<T> ||
 
 ### Build Systems
 
-- **mcpp** — `mcpp.toml`, C++23 modules with `import std;`, library code in `.cppm`, standalone `.cpp` tests (see `references-mcpp/`)
+- **mcpp** — `mcpp.toml`, C++23 modules with `import std;`, library interfaces in `.cppm` with implementations in `.cpp`, and `mcpplibs.mtest` cases in `tests/*.cpp` (see `references-mcpp/`)
 - **xmake** — module support, uses `.cppm` / `.cpp`; use the standard and toolchain configured by the project (see `references-xmake/`)
 - **CMake + vcpkg** — traditional header organization, uses `.hpp` / `.cpp` (see `references-cmake-vcpkg/`)
 
 ### Module Basics
 
 - Use `import std;` for the standard library in module projects; use standard headers in the CMake + vcpkg examples
-- Use `.cppm` for module interfaces; keep mcpp library implementations in those files, and use `.cpp` implementation units only when the selected project supports that organization
+- Use `.cppm` for module interfaces and `.cpp` module implementation units that declare `module style_ref;` for non-template definitions; this is the latest `mcpp new -t lib` layout
 - `export module module_name;` — module declaration
 - `export import :partition;` — export partition
 - `import :partition;` — import a partition without re-exporting it
@@ -137,7 +137,7 @@ Inside a partition, use `import :other;` for implementation dependencies and `ex
 
 ### Module Naming
 
-- A module name and its partitions need not mirror directory paths: `src/utils/error.cppm` can declare `style_ref:error`
+- A module name and its partitions need not mirror directory paths: a source file grouped under `src/utils/` can still declare `style_ref:error`
 - Use dotted module names for separate modules when appropriate (e.g., `a.b`, `a.c` in the xmake example)
 - Partitions: `module_name:partition` (e.g., `a:a1`, `a.b:b1`)
 - Keep existing partition names when moving files between responsibility-based directories
@@ -178,19 +178,9 @@ Put the public section first: constructors/special members, then the public inte
 
 ### Interface and Implementation
 
-Choose according to the project. The mcpp reference follows the combined style used by mcr; the xmake reference also demonstrates a separated implementation.
+Choose according to the project. The latest mcpp layout separates interface and implementation; the xmake reference also demonstrates a separated implementation.
 
-**Style A: Combined** — interface and implementation in a single `.cppm`:
-
-```cpp
-export module mylib;
-
-export auto add(int a, int b) -> int {
-    return a + b;
-}
-```
-
-**Style B: Separated** — interface in `.cppm`, implementation in `.cpp` (hides implementation at compile time):
+**Style A: Separated** — declarations in `.cppm`, non-template definitions in a `.cpp` module implementation unit (hides implementation at compile time). This is the latest `mcpp new -t lib` layout:
 
 ```cpp
 export module error;
@@ -210,7 +200,17 @@ auto Error::Test() -> void {
 }
 ```
 
-Use Style A for mcpp library code. In other module projects, use Style B when the existing organization separates non-template implementations.
+**Style B: Combined** — interface and implementation in a single `.cppm`:
+
+```cpp
+export module mylib;
+
+export auto add(int a, int b) -> int {
+    return a + b;
+}
+```
+
+Use Style A for mcpp library code. Use the combined style only for a project that already organizes its modules that way.
 
 ## Applicable Scenarios
 
