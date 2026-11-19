@@ -13,7 +13,7 @@ namespace a {
     /**
      * @brief Print a diagnostic and call the internal partition helper.
      */
-    export auto func_a2() -> void {
+    export void func_a2() {
         std::println("Function func_a2 from module a:a2");
         func_a1();
     }

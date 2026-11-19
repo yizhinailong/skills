@@ -9,6 +9,6 @@
 /**
  * @brief Print a greeting.
  */
-auto Error::Test() -> void {
+void Error::Test() {
     std::println("Hello");
 }

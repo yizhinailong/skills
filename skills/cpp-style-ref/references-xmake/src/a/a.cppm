@@ -15,7 +15,7 @@ namespace a {
     /**
      * @brief Run the primary module's public and internal helpers.
      */
-    export auto func_a() -> void {
+    export void func_a() {
         std::println("Function func_a from module a");
         func_a1();
         func_a2();

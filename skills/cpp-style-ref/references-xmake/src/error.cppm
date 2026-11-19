@@ -13,7 +13,7 @@ export struct Error {
     /**
      * @brief Print a greeting.
      */
-    auto Test() -> void {
+    void Test() {
         std::println("Hello");
     }
 };

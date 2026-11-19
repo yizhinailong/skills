@@ -40,7 +40,7 @@ Preserve established public API names, including PascalCase free entry points su
 - Use four spaces, no tabs, attached opening braces, and indentation inside namespaces; align access labels with the class declaration.
 - Attach `*` and `&` to the type: `char const*`, `StyleRef&`. Use `T const&` for references to const.
 - Use `value{ 42 }`, `Type{ value }`, and `value{}`; do not add a space before the opening initializer brace.
-- Prefer trailing return types: `[[nodiscard]] auto Parse() const noexcept -> Result<void>`.
+- Put the return type before the function name: `[[nodiscard]] Result<void> Parse() const noexcept`.
 - Follow the existing `.clang-format`; do not impose a general line limit. The reference style uses `ColumnLimit: 0`, but function signatures and `requires` clauses still follow the 100-column rules below.
 
 ### Comments
@@ -65,7 +65,7 @@ public:
      * @param config Text to copy; must not be empty.
      * @return Success or an invalid-configuration error.
      */
-    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+    [[nodiscard]] Result<void> LoadConfig(std::string_view config);
 
 private:
     std::string m_config_text; ///< Owned configuration text.
@@ -74,13 +74,13 @@ private:
 
 ### Function Signature Wrapping
 
-Wrap a signature when its single-line form, measured from the return type through the opening `{` or terminating `;` (including indentation, excluding trailing comments and an empty `{}` body), exceeds 100 columns. This applies to definitions, declarations, constructors, destructors, and operators. Break immediately after `(`, put one parameter per line indented one level with no trailing comma, and put `)` on its own line at the declaration's indentation followed by qualifiers, the trailing return type, and `{` or `;`. Keep default arguments and inline parameter comments with their parameter, and keep `->` on the `)` line.
+Wrap a signature when its single-line form, measured from the return type through the opening `{` or terminating `;` (including indentation, excluding trailing comments and an empty `{}` body), exceeds 100 columns. This applies to definitions, declarations, constructors, destructors, and operators. Break immediately after `(`, put one parameter per line indented one level with no trailing comma, and put `)` on its own line at the declaration's indentation followed by qualifiers and `{` or `;`. Keep default arguments and inline parameter comments with their parameter.
 
 ```cpp
-auto Result::get_header_value(
+std::string Result::get_header_value(
     std::string const& key,
     char const* def
-) const -> std::string {
+) const {
     ...
 }
 ```
@@ -107,7 +107,7 @@ requires std::integral<T> ||
     std::floating_point<T> ||
     std::same_as<T, std::string> ||
     std::same_as<T, std::string_view>
-[[nodiscard]] auto At(std::string_view key) const -> T;
+[[nodiscard]] T At(std::string_view key) const;
 ```
 
 ### Build Systems
@@ -149,14 +149,14 @@ class StyleRef {
 public:
     StyleRef() = default;
 
-    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+    [[nodiscard]] Result<void> LoadConfig(std::string_view config);
 
-    [[nodiscard]] auto Text() const noexcept -> std::string_view;
+    [[nodiscard]] std::string_view Text() const noexcept;
 
 private:
     std::string m_config_text;
 
-    auto loadConfig(std::string_view config) -> void;
+    void loadConfig(std::string_view config);
 };
 ```
 
@@ -185,7 +185,7 @@ export module mylib;
 
 import std;
 
-export auto add(int a, int b) -> int {
+export int add(int a, int b) {
     return a + b;
 }
 ```

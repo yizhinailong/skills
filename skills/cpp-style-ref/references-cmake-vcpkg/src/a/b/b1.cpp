@@ -13,7 +13,7 @@ namespace a::b {
     /**
      * @brief Print a diagnostic and call the second helper.
      */
-    auto func_b1() -> void {
+    void func_b1() {
         std::println("Function func_b1 from a/b/b1");
         func_b2();
     }

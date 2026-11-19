@@ -11,7 +11,7 @@ namespace a {
     /**
      * @brief Print a diagnostic for the internal helper.
      */
-    export auto func_a1() -> void {
+    export void func_a1() {
         std::println("Function func_a1 from module a:a1");
     }
 

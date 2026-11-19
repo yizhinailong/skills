@@ -14,7 +14,7 @@ namespace a::b {
     /**
      * @brief Run the nested module's public helpers.
      */
-    export auto func_ab() -> void {
+    export void func_ab() {
         std::println("Function func_ab from module a.b");
         func_b1();
         func_b2();

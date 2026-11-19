@@ -26,7 +26,7 @@ export namespace style_ref {
          * @throws std::bad_alloc If text or diagnostic allocation fails.
          * @throws std::length_error If the input exceeds string capacity.
          */
-        [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void> {
+        [[nodiscard]] Result<void> LoadConfig(std::string_view config) {
             if (config.empty()) {
                 return std::unexpected{
                     Error{ ErrorCode::InvalidConfig, "Configuration text must not be empty." }
@@ -40,7 +40,7 @@ export namespace style_ref {
          * @brief Borrow the stored configuration text.
          * @return View valid until this holder is changed or destroyed.
          */
-        [[nodiscard]] auto Text() const noexcept -> std::string_view {
+        [[nodiscard]] std::string_view Text() const noexcept {
             return m_config_text;
         }
 
@@ -51,7 +51,7 @@ export namespace style_ref {
          * @brief Copy text after boundary validation.
          * @param config Validated text to copy.
          */
-        auto loadConfig(std::string_view config) -> void {
+        void loadConfig(std::string_view config) {
             m_config_text.assign(config);
         }
     };

@@ -13,7 +13,7 @@
  * @brief Run the header/source examples.
  * @return Zero after all public calls complete.
  */
-auto main() -> int {
+int main() {
     // a/a1.hpp is an internal header and is not included by public headers.
     a::func_a2();
 

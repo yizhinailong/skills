@@ -9,6 +9,6 @@ namespace a {
     /**
      * @brief Print a diagnostic and call the internal helper.
      */
-    auto func_a2() -> void;
+    void func_a2();
 
 } // namespace a

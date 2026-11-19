@@ -11,5 +11,5 @@ struct Error {
     /**
      * @brief Print a greeting.
      */
-    auto Test() -> void;
+    void Test();
 };

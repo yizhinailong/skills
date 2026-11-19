@@ -25,18 +25,18 @@ int max_retry_count{ 3 };
 
 ### 1.2 Functions
 
-Public methods use PascalCase; private methods use camelCase. Free helpers use snake_case. Use trailing return types when a function has an ordinary return type.
+Public methods use PascalCase; private methods use camelCase. Free helpers use snake_case. Put the return type before the function name when a function has an ordinary return type.
 
 ```cpp
 class StyleRef {
 public:
-    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+    [[nodiscard]] Result<void> LoadConfig(std::string_view config);
 
 private:
-    auto loadConfig(std::string_view config) -> void;
+    void loadConfig(std::string_view config);
 };
 
-auto parse_config(std::string_view config) -> Result<std::string>;
+Result<std::string> parse_config(std::string_view config);
 ```
 
 Preserve established public free-function names, such as mcr's `Get()` and `GetAsync()`. Standard protocol methods such as `begin()`, `end()`, `allocate()`, and coroutine hooks retain their required spelling.
@@ -95,14 +95,14 @@ Use block style for the wrapped signature:
 
 - Break immediately after `(`.
 - Put exactly one parameter per line, indented one level from the declaration. Do not pack parameters together and do not add a trailing comma.
-- Put `)` on its own line at the declaration's indentation, followed by qualifiers, the trailing return type, and `{` or `;`.
-- Keep default arguments and inline parameter comments on their parameter's line. Keep the trailing return type on the `)` line; do not break before `->`.
+- Put `)` on its own line at the declaration's indentation, followed by qualifiers and `{` or `;`.
+- Keep default arguments and inline parameter comments on their parameter's line.
 
 ```cpp
-auto Result::get_header_value(
+std::string Result::get_header_value(
     std::string const& key,
     char const* def
-) const -> std::string {
+) const {
     ...
 }
 ```
@@ -138,14 +138,14 @@ When the clause's line, including indentation, exceeds 100 columns, break after 
 ```cpp
 template <typename T>
 requires std::integral<T> || std::floating_point<T>
-auto from_chars_strict(std::string_view value) -> T;
+T from_chars_strict(std::string_view value);
 
 template <typename T = std::string_view>
 requires std::integral<T> ||
     std::floating_point<T> ||
     std::same_as<T, std::string> ||
     std::same_as<T, std::string_view>
-[[nodiscard]] auto At(std::string_view key) const -> T;
+[[nodiscard]] T At(std::string_view key) const;
 ```
 
 ### 1.10 Template and File Naming
@@ -243,14 +243,14 @@ class StyleRef {
 public:
     StyleRef() = default;
 
-    [[nodiscard]] auto LoadConfig(std::string_view config) -> Result<void>;
+    [[nodiscard]] Result<void> LoadConfig(std::string_view config);
 
-    [[nodiscard]] auto Text() const noexcept -> std::string_view;
+    [[nodiscard]] std::string_view Text() const noexcept;
 
 private:
     std::string m_config_text;
 
-    auto loadConfig(std::string_view config) -> void;
+    void loadConfig(std::string_view config);
 };
 ```
 
@@ -305,7 +305,7 @@ cmake --build --preset debug
 
 ### auto and Return Types
 
-Use `auto` for iterators, lambdas, and complex types; retain explicit types when they clarify intent. Use `auto Name(...) -> ReturnType` for functions with ordinary return types. Constructors, destructors, and conversion operators retain their language-required syntax.
+Use `auto` for iterators, lambdas, and complex types; retain explicit types when they clarify intent. Put the return type before the function name for ordinary functions, such as `Result<void> LoadConfig(...)`. Constructors, destructors, and conversion operators retain their language-required syntax.
 
 ### Brace Initialization
 

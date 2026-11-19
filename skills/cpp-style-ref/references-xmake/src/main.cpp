@@ -10,7 +10,7 @@ import error;
  * @brief Run the module examples.
  * @return Zero after all public calls complete.
  */
-auto main() -> int {
+int main() {
     a::func_a();
     // a::func_a1() is unavailable because partition a:a1 is not re-exported.
     a::func_a2();

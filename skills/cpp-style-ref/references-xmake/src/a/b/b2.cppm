@@ -11,7 +11,7 @@ namespace a::b {
     /**
      * @brief Print a diagnostic for the second helper.
      */
-    export auto func_b2() -> void {
+    export void func_b2() {
         std::println("Function func_b2 from module a.b:b2");
     }
 

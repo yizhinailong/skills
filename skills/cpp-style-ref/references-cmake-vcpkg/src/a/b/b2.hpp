@@ -9,6 +9,6 @@ namespace a::b {
     /**
      * @brief Print a diagnostic for the second helper.
      */
-    auto func_b2() -> void;
+    void func_b2();
 
 } // namespace a::b
