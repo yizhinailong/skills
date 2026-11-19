@@ -78,24 +78,24 @@ namespace drogon_echo {
          * @throws std::invalid_argument If `base_url` is missing or empty, or if
          * `api_key_env` names an unset or empty environment variable.
          */
-        auto initAndStart(Json::Value const& config) -> void override;
+        void initAndStart(Json::Value const& config) override;
 
         /**
          * @brief Release resources on application shutdown.
          */
-        auto shutdown() -> void override;
+        void shutdown() override;
 
         /**
          * @brief Return the settings parsed from config.json.
          * @return Settings valid after drogon has initialized the plugin.
          */
-        [[nodiscard]] auto Config() const noexcept -> EchoConfig const&;
+        [[nodiscard]] EchoConfig const& Config() const noexcept;
 
         /**
          * @brief Create an `Echo` client for the configured endpoint.
          * @return A new client; call only after drogon has initialized the plugin.
          */
-        [[nodiscard]] auto NewEchoClient() const -> Echo;
+        [[nodiscard]] Echo NewEchoClient() const;
     };
 
 } // namespace drogon_echo

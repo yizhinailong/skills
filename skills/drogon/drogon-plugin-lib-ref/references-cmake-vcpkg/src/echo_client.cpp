@@ -20,7 +20,7 @@ namespace {
      * @return The variable's value, or an empty string when `env_name` is empty.
      * @throws std::invalid_argument If the variable is unset or empty.
      */
-    auto read_api_key(std::string const& env_name) -> std::string {
+    std::string read_api_key(std::string const& env_name) {
         if (env_name.empty()) {
             return {};
         }
@@ -48,7 +48,7 @@ namespace drogon_echo {
      * @throws std::invalid_argument If `base_url` is missing or empty, or if
      * `api_key_env` names an unset or empty environment variable.
      */
-    auto EchoClient::initAndStart(Json::Value const& config) -> void {
+    void EchoClient::initAndStart(Json::Value const& config) {
         m_config = EchoConfig{
             .base_url = config.get("base_url", "").asString(),
             .api_key = read_api_key(config.get("api_key_env", "").asString()),
@@ -61,13 +61,13 @@ namespace drogon_echo {
     /**
      * @brief Release resources on application shutdown.
      */
-    auto EchoClient::shutdown() -> void {}
+    void EchoClient::shutdown() {}
 
     /**
      * @brief Return the settings parsed from config.json.
      * @return Settings valid after drogon has initialized the plugin.
      */
-    auto EchoClient::Config() const noexcept -> EchoConfig const& {
+    EchoConfig const& EchoClient::Config() const noexcept {
         return m_config;
     }
 
@@ -75,7 +75,7 @@ namespace drogon_echo {
      * @brief Create an `Echo` client for the configured endpoint.
      * @return A new client; call only after drogon has initialized the plugin.
      */
-    auto EchoClient::NewEchoClient() const -> Echo {
+    Echo EchoClient::NewEchoClient() const {
         return Echo{ m_config };
     }
 

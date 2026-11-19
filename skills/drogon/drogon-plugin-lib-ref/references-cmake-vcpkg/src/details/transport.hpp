@@ -38,7 +38,7 @@ namespace drogon_echo::details {
          * @brief Return the endpoint settings.
          * @return Settings passed to the constructor.
          */
-        [[nodiscard]] auto Config() const noexcept -> EchoConfig const&;
+        [[nodiscard]] EchoConfig const& Config() const noexcept;
 
         /**
          * @brief POST a JSON body and await the JSON response.
@@ -48,11 +48,11 @@ namespace drogon_echo::details {
          * @return Task yielding the parsed body of a 2xx response, or why the request failed.
          * @note The caller keeps this object alive until the task completes.
          */
-        [[nodiscard]] auto Post(
+        [[nodiscard]] drogon::Task<Result<Json::Value>> Post(
             std::string path,
             Json::Value body,
             double timeout
-        ) const -> drogon::Task<Result<Json::Value>>;
+        ) const;
     };
 
 } // namespace drogon_echo::details

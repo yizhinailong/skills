@@ -21,7 +21,7 @@ namespace {
      * @param req Incoming request, taken by value so it outlives the caller's frame.
      * @return Task yielding the response.
      */
-    auto handle_messages(drogon::HttpRequestPtr req) -> drogon::Task<drogon::HttpResponsePtr> {
+    drogon::Task<drogon::HttpResponsePtr> handle_messages(drogon::HttpRequestPtr req) {
         auto const& json{ req->getJsonObject() };
         if (json == nullptr || !(*json)["text"].isString() || (*json)["text"].asString().empty()) {
             Json::Value error{ Json::objectValue };
@@ -38,7 +38,7 @@ namespace {
      * @param echo Client created by the EchoClient plugin, copied so it outlives the caller's frame.
      * @return True if the valid message came back unchanged and the empty one failed with `Status`.
      */
-    auto send_messages(drogon_echo::Echo echo) -> drogon::Task<bool> {
+    drogon::Task<bool> send_messages(drogon_echo::Echo echo) {
         auto const echoed{ co_await echo.messages.Create({
             .text = std::string{ TEXT },
             .sender = "test_messages",
@@ -64,7 +64,7 @@ namespace {
 
 } // namespace
 
-auto main() -> int {
+int main() {
     int exit_code{ 1 };
     drogon::app()
         .loadConfigFile("config.json")

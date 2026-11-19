@@ -19,7 +19,7 @@ namespace {
      * @param base_url Base URL such as `https://api.example.com/v1`; a trailing `/` is ignored.
      * @return Host and path prefix, e.g. `https://api.example.com` and `/v1`; the prefix is empty without a path.
      */
-    auto split_base_url(std::string_view base_url) -> std::pair<std::string, std::string> {
+    std::pair<std::string, std::string> split_base_url(std::string_view base_url) {
         if (base_url.ends_with('/')) {
             base_url.remove_suffix(1);
         }
@@ -39,7 +39,7 @@ namespace {
      * @param response Response from the endpoint.
      * @return The `error.message` field when the body has one, otherwise the raw body.
      */
-    auto status_error_message(drogon::HttpResponse const& response) -> std::string {
+    std::string status_error_message(drogon::HttpResponse const& response) {
         auto const& json{ response.getJsonObject() };
         if (json != nullptr && json->isObject()) {
             Json::Value const& error{ (*json)["error"] };
@@ -54,7 +54,7 @@ namespace {
      * @brief Pick the event loop for a new HTTP client.
      * @return The calling thread's loop, or the app's main loop when the thread runs none.
      */
-    auto current_loop() -> trantor::EventLoop* {
+    trantor::EventLoop* current_loop() {
         auto* const loop{ trantor::EventLoop::getEventLoopOfCurrentThread() };
         return loop != nullptr ? loop : drogon::app().getLoop();
     }
@@ -76,7 +76,7 @@ namespace drogon_echo::details {
      * @brief Return the endpoint settings.
      * @return Settings passed to the constructor.
      */
-    auto Transport::Config() const noexcept -> EchoConfig const& {
+    EchoConfig const& Transport::Config() const noexcept {
         return m_config;
     }
 
@@ -88,11 +88,11 @@ namespace drogon_echo::details {
      * @return Task yielding the parsed body of a 2xx response, or why the request failed.
      * @note The caller keeps this object alive until the task completes.
      */
-    auto Transport::Post(
+    drogon::Task<Result<Json::Value>> Transport::Post(
         std::string path,
         Json::Value body,
         double timeout
-    ) const -> drogon::Task<Result<Json::Value>> {
+    ) const {
         auto request{ drogon::HttpRequest::newHttpJsonRequest(body) };
         request->setMethod(drogon::Post);
         request->setPath(m_path_prefix + path);

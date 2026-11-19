@@ -17,7 +17,7 @@ namespace drogon_echo::details {
          * @param value Field that should hold a string.
          * @return The string, or unset if `value` is missing or not a string.
          */
-        auto optional_string(Json::Value const& value) -> std::optional<std::string> {
+        std::optional<std::string> optional_string(Json::Value const& value) {
             if (!value.isString()) {
                 return std::nullopt;
             }
@@ -29,7 +29,7 @@ namespace drogon_echo::details {
          * @param params Request fields.
          * @return Request body; unset optional fields are left out.
          */
-        auto to_request_body(MessageCreateParams const& params) -> Json::Value {
+        Json::Value to_request_body(MessageCreateParams const& params) {
             Json::Value body{ Json::objectValue };
             body["text"] = params.text;
             if (params.sender) {
@@ -43,7 +43,7 @@ namespace drogon_echo::details {
          * @param root Parsed response body.
          * @return The message, or a `ResponseValidation` error if `text` is not a string.
          */
-        auto parse_message(Json::Value const& root) -> Result<Message> {
+        Result<Message> parse_message(Json::Value const& root) {
             if (!root.isObject() || !root["text"].isString()) {
                 return std::unexpected{ Error{
                     .kind = ErrorKind::ResponseValidation,
@@ -73,9 +73,9 @@ namespace drogon_echo::details {
      * @note The request runs on the calling thread's event loop (the main loop when the
      * thread runs none), so the coroutine resumes on the thread that awaited it.
      */
-    auto Messages::Create(
+    drogon::Task<Result<Message>> Messages::Create(
         MessageCreateParams params
-    ) const -> drogon::Task<Result<Message>> {
+    ) const {
         // Keep the transport in the coroutine frame in case this object dies mid-request.
         auto const transport{ m_transport };
         auto const response{ co_await transport->Post("/messages", to_request_body(params), params.timeout) };

@@ -48,7 +48,7 @@ drogon-<x>/
 ## Plugin Class
 
 - Derive `drogon::Plugin<<X>Client>` and keep the class default-constructible. Drogon registers it under its demangled, namespace-qualified name (`drogon_<x>::<X>Client`), and apps list that name under `plugins` with an optional `config` object and `dependencies` array.
-- Keep drogon's override names `initAndStart` and `shutdown`; other public methods are PascalCase. Provide `Config() const noexcept -> <X>Config const&` and a `const` factory `New<X>Client() -> <X>` that returns the handle by value.
+- Keep drogon's override names `initAndStart` and `shutdown`; other public methods are PascalCase. Provide `<X>Config const& Config() const noexcept` and a `const` factory `New<X>Client()` that returns `<X>` by value.
 - `initAndStart` parses and validates the `config` object into the `m_config` member. Throw `std::invalid_argument` with a `drogon_<x>::<X>Client: ...` message for a missing or invalid value. Do not return `std::expected` here: the override returns `void`, and drogon ignores the outcome; the exception propagates out of `app().run()`.
 - Do not block or await network I/O in `initAndStart`: it runs inside `run()` before any event loop is looping.
 - The plugin class doc comment shows a config.json registration example, states that `getPlugin` works only after `run()` starts, and carries a `@note` on static linking: the app must reference the class, or the linker drops it and drogon logs `Plugin ... undefined!` and continues.

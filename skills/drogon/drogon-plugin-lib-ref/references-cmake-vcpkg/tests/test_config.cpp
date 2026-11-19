@@ -16,7 +16,7 @@ namespace {
      * Drogon initializes plugins inside `app().run()`, so call this from a
      * beginning advice rather than before `run()`.
      */
-    auto print_echo_config() -> void {
+    void print_echo_config() {
         auto const& config{ drogon::app().getPlugin<drogon_echo::EchoClient>()->Config() };
         std::println("base_url: {}", config.base_url);
         std::println("api_key: {}", config.api_key.empty() ? "(empty)" : "(set)");
@@ -25,7 +25,7 @@ namespace {
 
 } // namespace
 
-auto main() -> int {
+int main() {
     drogon::app()
         .loadConfigFile("config.json")
         .registerBeginningAdvice(print_echo_config)

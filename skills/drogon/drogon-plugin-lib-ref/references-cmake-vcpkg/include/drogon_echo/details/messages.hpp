@@ -36,9 +36,9 @@ namespace drogon_echo::details {
          * @note The request runs on the calling thread's event loop (the main loop when the
          * thread runs none), so the coroutine resumes on the thread that awaited it.
          */
-        [[nodiscard]] auto Create(
+        [[nodiscard]] drogon::Task<Result<Message>> Create(
             MessageCreateParams params
-        ) const -> drogon::Task<Result<Message>>;
+        ) const;
     };
 
 } // namespace drogon_echo::details
