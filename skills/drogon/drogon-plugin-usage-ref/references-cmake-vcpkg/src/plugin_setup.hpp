@@ -14,6 +14,6 @@ namespace plugin_demo {
      * Hodor's rejection response, which Hodor accepts only after `run()` starts.
      * Call this after `loadConfigFile()` and before `run()`.
      */
-    auto RegisterPluginSetup() -> void;
+    void RegisterPluginSetup();
 
 } // namespace plugin_demo

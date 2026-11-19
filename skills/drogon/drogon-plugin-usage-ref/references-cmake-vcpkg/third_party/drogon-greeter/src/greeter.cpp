@@ -14,7 +14,7 @@ namespace drogon_greeter {
      * @param config The plugin's `config` object; `greeting` defaults to `Hello`.
      * @throws std::invalid_argument If `greeting` is empty.
      */
-    auto Greeter::initAndStart(Json::Value const& config) -> void {
+    void Greeter::initAndStart(Json::Value const& config) {
         m_greeting = config.get("greeting", "Hello").asString();
         if (m_greeting.empty()) {
             throw std::invalid_argument{ "drogon_greeter::Greeter: greeting must not be empty" };
@@ -24,14 +24,14 @@ namespace drogon_greeter {
     /**
      * @brief Release resources on application shutdown.
      */
-    auto Greeter::shutdown() -> void {}
+    void Greeter::shutdown() {}
 
     /**
      * @brief Greet a visitor; safe to call from any thread.
      * @param name Visitor name.
      * @return Text such as `Hello, bob!`.
      */
-    auto Greeter::Greet(std::string_view name) const -> std::string {
+    std::string Greeter::Greet(std::string_view name) const {
         return std::format("{}, {}!", m_greeting, name);
     }
 

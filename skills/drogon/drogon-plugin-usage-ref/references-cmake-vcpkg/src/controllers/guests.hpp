@@ -29,7 +29,7 @@ namespace plugin_demo {
          * @param name Visitor name from the path.
          * @return Task yielding a JSON body with `greeting`, `number`, and `ip`.
          */
-        auto Sign(drogon::HttpRequestPtr req, std::string name) -> drogon::Task<drogon::HttpResponsePtr>;
+        drogon::Task<drogon::HttpResponsePtr> Sign(drogon::HttpRequestPtr req, std::string name);
     };
 
 } // namespace plugin_demo

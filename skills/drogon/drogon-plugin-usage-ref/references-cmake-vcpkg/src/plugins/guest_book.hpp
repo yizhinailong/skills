@@ -48,19 +48,19 @@ namespace plugin_demo {
          * @param config The plugin's `config` object; `first_number` defaults to 1.
          * @throws std::invalid_argument If `Greeter` is not loaded.
          */
-        auto initAndStart(Json::Value const& config) -> void override;
+        void initAndStart(Json::Value const& config) override;
 
         /**
          * @brief Release resources on application shutdown.
          */
-        auto shutdown() -> void override;
+        void shutdown() override;
 
         /**
          * @brief Greet a visitor and assign the next visitor number.
          * @param name Visitor name.
          * @return The greeting and the assigned number.
          */
-        [[nodiscard]] auto Sign(std::string_view name) -> Entry;
+        [[nodiscard]] Entry Sign(std::string_view name);
     };
 
 } // namespace plugin_demo

@@ -39,7 +39,7 @@ namespace {
      * @brief Check that drogon created every plugin listed in config.json.
      * @return True if `getPlugin(name)` found all of them.
      */
-    auto check_loaded() -> bool {
+    bool check_loaded() {
         bool ok{ true };
         for (auto const name : PLUGIN_NAMES) {
             if (drogon::app().getPlugin(std::string{ name }) == nullptr) {
@@ -60,7 +60,7 @@ namespace {
      * @return Task yielding the response.
      * @throws drogon::HttpException If the request fails.
      */
-    auto get(std::string path, std::string client_ip) -> drogon::Task<drogon::HttpResponsePtr> {
+    drogon::Task<drogon::HttpResponsePtr> get(std::string path, std::string client_ip) {
         auto client{ drogon::HttpClient::newHttpClient(std::string{ BASE_URL }, trantor::EventLoop::getEventLoopOfCurrentThread()) };
         auto request{ drogon::HttpRequest::newHttpRequest() };
         request->setPath(path);
@@ -72,7 +72,7 @@ namespace {
      * @brief Check GuestBook, Greeter, and RealIpResolver through `GET /guests/bob`.
      * @return Task yielding true if the greeting, number, and resolved address match.
      */
-    auto check_sign() -> drogon::Task<bool> {
+    drogon::Task<bool> check_sign() {
         auto const response{ co_await get("/guests/bob", "203.0.113.7") };
         auto const json{ response->getJsonObject() };
         if (response->statusCode() != drogon::k200OK || json == nullptr) {
@@ -94,7 +94,7 @@ namespace {
      * @brief Check SlashRemover and Redirector through a path with extra slashes.
      * @return Task yielding true if the app redirects to the cleaned path.
      */
-    auto check_redirect() -> drogon::Task<bool> {
+    drogon::Task<bool> check_redirect() {
         auto const response{ co_await get("//guests//bob/", "203.0.113.7") };
         auto const& location{ response->getHeader("location") };
         if (response->statusCode() != drogon::k302Found || !location.ends_with("/guests/bob")) {
@@ -109,7 +109,7 @@ namespace {
      * @brief Check Hodor and the rejection response installed by the beginning advice.
      * @return Task yielding true if one client gets `ip_capacity` answers and then a 429.
      */
-    auto check_rate_limit() -> drogon::Task<bool> {
+    drogon::Task<bool> check_rate_limit() {
         for (int i{ 0 }; i < HODOR_IP_CAPACITY; ++i) {
             auto const response{ co_await get("/guests/carol", "203.0.113.8") };
             if (response->statusCode() != drogon::k200OK) {
@@ -131,7 +131,7 @@ namespace {
      * @brief Run every check, continuing after a failure.
      * @return Task yielding true if all checks passed.
      */
-    auto run_checks() -> drogon::Task<bool> {
+    drogon::Task<bool> run_checks() {
         bool ok{ check_loaded() };
         ok = co_await check_sign() && ok;
         ok = co_await check_redirect() && ok;
@@ -141,7 +141,7 @@ namespace {
 
 } // namespace
 
-auto main() -> int {
+int main() {
     int exit_code{ 1 };
     drogon::app().loadConfigFile("config.json");
     plugin_demo::RegisterPluginSetup();

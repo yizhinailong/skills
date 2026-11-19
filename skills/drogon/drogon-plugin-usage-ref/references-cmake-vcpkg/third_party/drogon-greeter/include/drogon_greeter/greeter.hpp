@@ -39,19 +39,19 @@ namespace drogon_greeter {
          * @param config The plugin's `config` object; `greeting` defaults to `Hello`.
          * @throws std::invalid_argument If `greeting` is empty.
          */
-        auto initAndStart(Json::Value const& config) -> void override;
+        void initAndStart(Json::Value const& config) override;
 
         /**
          * @brief Release resources on application shutdown.
          */
-        auto shutdown() -> void override;
+        void shutdown() override;
 
         /**
          * @brief Greet a visitor; safe to call from any thread.
          * @param name Visitor name.
          * @return Text such as `Hello, bob!`.
          */
-        [[nodiscard]] auto Greet(std::string_view name) const -> std::string;
+        [[nodiscard]] std::string Greet(std::string_view name) const;
     };
 
 } // namespace drogon_greeter

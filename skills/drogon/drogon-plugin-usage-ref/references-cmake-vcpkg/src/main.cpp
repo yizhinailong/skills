@@ -6,7 +6,7 @@
 
 #include "plugin_setup.hpp"
 
-auto main() -> int {
+int main() {
     // Including <drogon/drogon.h> also registers drogon's built-in plugins in a static build.
     drogon::app().loadConfigFile("config.json");
     plugin_demo::RegisterPluginSetup();

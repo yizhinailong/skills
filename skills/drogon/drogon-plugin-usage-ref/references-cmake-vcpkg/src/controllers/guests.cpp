@@ -17,7 +17,10 @@ namespace plugin_demo {
      * @param name Visitor name from the path.
      * @return Task yielding a JSON body with `greeting`, `number`, and `ip`.
      */
-    auto Guests::Sign(drogon::HttpRequestPtr req, std::string name) -> drogon::Task<drogon::HttpResponsePtr> {
+    drogon::Task<drogon::HttpResponsePtr> Guests::Sign(
+        drogon::HttpRequestPtr req,
+        std::string name
+    ) {
         // getPlugin<T>() caches the pointer after its first call, so a lookup per request is cheap.
         // The beginning advice in plugin_setup.cpp has already checked that GuestBook is loaded.
         auto const entry{ drogon::app().getPlugin<GuestBook>()->Sign(name) };

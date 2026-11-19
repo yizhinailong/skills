@@ -15,7 +15,7 @@ namespace plugin_demo {
      * @param config The plugin's `config` object; `first_number` defaults to 1.
      * @throws std::invalid_argument If `Greeter` is not loaded.
      */
-    auto GuestBook::initAndStart(Json::Value const& config) -> void {
+    void GuestBook::initAndStart(Json::Value const& config) {
         // Listing Greeter under "dependencies" makes drogon initialize it first.
         m_greeter = drogon::app().getPlugin<drogon_greeter::Greeter>();
         if (m_greeter == nullptr) {
@@ -27,14 +27,14 @@ namespace plugin_demo {
     /**
      * @brief Release resources on application shutdown.
      */
-    auto GuestBook::shutdown() -> void {}
+    void GuestBook::shutdown() {}
 
     /**
      * @brief Greet a visitor and assign the next visitor number.
      * @param name Visitor name.
      * @return The greeting and the assigned number.
      */
-    auto GuestBook::Sign(std::string_view name) -> Entry {
+    Entry GuestBook::Sign(std::string_view name) {
         return Entry{
             .greeting = m_greeter->Greet(name),
             .number = m_next.fetch_add(1),
