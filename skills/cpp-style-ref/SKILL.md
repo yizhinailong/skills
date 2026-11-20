@@ -45,7 +45,7 @@ Preserve established public API names, including PascalCase free entry points su
 
 ### Comments
 
-Write code without comments by default: no `@file` headers, Doxygen blocks, `///<` member comments, or `//` implementation notes. Add comments only when the user, project instructions such as `AGENTS.md`, or another active skill explicitly asks for them, and comment only what the request covers. Closing namespace comments such as `} // namespace style_ref` are part of the formatting and stay; so do `// clang-format off` directives. Do not delete existing comments, and keep them accurate when changing the code they describe.
+Write code without comments by default: no `@file` headers, Doxygen blocks, `///<` member comments, or `//` implementation notes. Add comments only when the user, project instructions such as `AGENTS.md`, or another active skill explicitly asks for them, and comment only what the request covers. Even then, skip declarations whose name already shows their purpose; do not restate a variable, member, or function name in a comment. Closing namespace comments such as `} // namespace style_ref` are part of the formatting and stay; so do `// clang-format off` directives. Do not delete existing comments, and keep them accurate when changing the code they describe.
 
 When comments are requested, use this format:
 

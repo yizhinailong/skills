@@ -364,11 +364,14 @@ Write code without comments by default. Do not add `@file` headers, Doxygen bloc
 
 Add comments only when the user, project instructions such as `AGENTS.md`, or another active skill explicitly asks for them. Comment only what the request covers, such as one function, the public interface, or a whole file, and use the format below.
 
+Skip declarations whose name already shows their purpose: if a variable, member, or function name makes the intent clear, do not restate it in a comment.
+
 These rules do not apply to:
 
 - Closing namespace comments such as `} // namespace style_ref`, which are part of the formatting described in section 1.6.
 - Tool directives such as `// clang-format off`.
 - Existing comments. Do not delete them, and keep them accurate when changing the code they describe.
+- The sample projects in `references-*/`. They stay fully commented as demonstrations of the requested format; do not trim their comments.
 
 ### Format
 
