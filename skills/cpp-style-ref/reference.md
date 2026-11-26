@@ -303,6 +303,62 @@ cmake --build --preset debug
 
 ## 5. Practice Reference
 
+### Latest Supported Features
+
+Write new code with the newest language and library facility the project's configured standard and toolchain actually provide, instead of the older construct that solves the same problem. This governs new code only: do not rewrite working code, and do not raise the project's standard, add a compiler flag, or vendor a compatibility library to reach a feature. What counts as "latest" comes from the project's configuration, not from the newest standard that exists.
+
+Read the configured standard instead of assuming it — `CMAKE_CXX_STANDARD` in `CMakeLists.txt`, `set_languages` in `xmake.lua`, or the standard and toolchain keys in `mcpp.toml`. The references here are C++23 for mcpp and CMake + vcpkg, and C++26 for xmake (`import std;`). Then confirm the specific facility with its feature-test macro from `<version>` rather than inferring it from a compiler version:
+
+| Facility                      | Macro                                         |
+| ----------------------------- | --------------------------------------------- |
+| Deduced `this` parameter      | `__cpp_explicit_this_parameter`               |
+| `std::expected` (incl. monadic) | `__cpp_lib_expected`                        |
+| `std::span`                   | `__cpp_lib_span`                              |
+| `std::format` / `std::print`  | `__cpp_lib_format` / `__cpp_lib_print`        |
+| Ranges: `to`, `zip`, `fold`   | `__cpp_lib_ranges_to_container`, `__cpp_lib_ranges_zip`, `__cpp_lib_ranges_fold` |
+| `std::flat_map`, `std::flat_set` | `__cpp_lib_flat_map`                       |
+| `std::mdspan`, `std::mdarray` | `__cpp_lib_mdspan` (C++26: `__cpp_lib_mdarray`) |
+| `std::generator`              | `__cpp_lib_generator`                         |
+| `std::jthread`                | `__cpp_lib_jthread`                           |
+| `std::bit_cast`               | `__cpp_lib_bit_cast`                          |
+
+When a macro is absent, fall back to the next-newest portable form for that one facility — an index loop in place of a range algorithm, an explicit `if` in place of a monadic chain — rather than hand-writing a replacement for the newer feature.
+
+| Instead of                                                    | Prefer                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Index loops and explicit iterator pairs                       | Range `for`, `std::ranges::find` / `sort` / `fold_left`, `std::ranges::to<std::vector>()`, `std::views::filter` / `transform` |
+| Parallel containers driven by one index                       | `for (auto&& [key, value] : std::views::zip(keys, values))`, `std::views::enumerate`       |
+| `char const*` with a length, `T*` plus `size_t`               | `std::string_view`, `std::span<T>`                                                        |
+| Hand-written comparison operators                             | Defaulted `operator<=>`, delegating `operator==`                                          |
+| `std::enable_if` overload sets, tag dispatch                  | Concepts with `requires`                                                                  |
+| CRTP for static polymorphism                                  | Deduced `this` parameter (`this auto&& self`)                                             |
+| `snprintf`, `ostringstream`                                   | `std::format`, `std::print`                                                               |
+| `atoi`, `sscanf`, `std::stoi`                                 | `std::from_chars`; `std::to_chars` for the reverse                                        |
+| `memcpy` type punning, `union` tricks                         | `std::bit_cast`                                                                           |
+| `std::map` or a hand-sorted vector for a small lookup table   | `std::flat_map`, `std::flat_set`                                                          |
+| Nested `std::vector<std::vector<T>>` grids                    | `std::mdspan` (C++23), `std::mdarray` (C++26)                                             |
+| `std::thread` with an atomic stop flag                        | `std::jthread`, `std::stop_token`                                                         |
+| Chained `has_value()` tests on `std::optional`                | `and_then`, `transform`, `or_else`                                                        |
+| A hand-written iterator class                                 | `std::generator` coroutine                                                                |
+| Runtime-computed constants, aggregate initialization by position | `constexpr`, `consteval` for compile-time validation, designated initializers           |
+| `typedef`, `NULL`, unscoped `enum`                            | `using`, `nullptr`, `enum class`                                                          |
+| Scattered standard includes in a module project               | `import std;` (see [Modules](#2-modules))                                                 |
+
+A newer facility still has to earn its place. Keep the older form when the newer one hides the contract: a named return type where `auto` would obscure what a function yields, an explicit `if` chain where a monadic chain reads as a puzzle, a plain loop where a views pipeline spends several lines to save one. Prefer the standard facility over an equivalent third-party one in new code, but keep a dependency the project already uses and do not migrate away from it unless asked.
+
+```cpp
+template <std::integral T>
+requires(!std::same_as<T, bool>)
+[[nodiscard]] Result<std::string> SumReport(std::span<T const> values) {
+    if (values.empty()) {
+        return std::unexpected{ Error{ ErrorCode::InvalidConfig, "empty input" } };
+    }
+
+    auto const total = std::ranges::fold_left(values, T{ 0 }, std::plus{});
+    return std::format("sum={} count={}", total, values.size());
+}
+```
+
 ### auto and Return Types
 
 Use `auto` for iterators, lambdas, and complex types; retain explicit types when they clarify intent. Put the return type before the function name for ordinary functions, such as `Result<void> LoadConfig(...)`. Constructors, destructors, and conversion operators retain their language-required syntax.

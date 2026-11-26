@@ -164,6 +164,7 @@ Put the public section first: constructors/special members, then the public inte
 
 ### Practice Rules
 
+- **Latest supported features**: write new code with the newest language and library facility the project's configured standard and compiler actually support, in place of the older construct that does the same job — ranges over index loops, `std::span` for borrowed buffers, concepts over SFINAE, `<=>` over hand-written comparisons, deducing this over CRTP. Confirm availability with the feature-test macros in `<version>`, and never raise the project's standard or enable an experimental flag to reach a feature ([details](reference.md#latest-supported-features))
 - **Initialization**: use `{}` — `int n{ 42 }`, `std::vector<int> v{ 1, 2, 3 }`
 - **Strings**: use `std::string_view` for read-only parameters
 - **Errors**: use `std::optional` for an absent value and `std::expected<T, Error>` for recoverable failures; a `Result<T>` alias may name the latter
